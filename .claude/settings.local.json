@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://api.github.com/users/Rexy-5097\")",
+      "Bash(curl -s \"https://api.github.com/users/Rexy-5097/repos?per_page=100&sort=updated\")",
+      "Bash(python3 -c ' *)",
+      "Bash(gh auth *)",
+      "Bash(curl -s \"https://api.github.com/rate_limit\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\)['resources']['core']; print\\('remaining:', d['remaining']\\)\")",
+      "Bash(gh api *)",
+      "mcp__visualize__read_me",
+      "mcp__visualize__show_widget",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m 'Phase 3A: foundation — design tokens, evidence type system, core primitives *)"
+    ]
+  }
+}

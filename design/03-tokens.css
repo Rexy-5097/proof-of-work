@@ -1,0 +1,128 @@
+/* PROOF OF WORK — Design Tokens v1.0 (Phase 2)
+   Single source of truth. Tailwind config and components consume these. */
+
+:root {
+  /* ---------- substrate ---------- */
+  --bg-0: #070b12;
+  --bg-1: #0b111b;
+  --bg-2: #101826;
+  --bg-3: #16202f;
+
+  /* ---------- ink ---------- */
+  --ink-hi: #e6edf6;
+  --ink-md: #9db0c4;
+  --ink-lo: #5f7288;
+
+  /* ---------- line ---------- */
+  --line: rgba(148, 163, 184, 0.14);
+  --line-strong: rgba(148, 163, 184, 0.26);
+  --line-seal: rgba(61, 214, 152, 0.4);
+
+  /* ---------- verdict (semantic only) ---------- */
+  --seal: #3dd698;
+  --seal-bright: #5ee8b0;      /* hover/active on seal elements only */
+  --seal-dim: rgba(61, 214, 152, 0.12);
+  --caution: #d9a245;
+  --caution-dim: rgba(217, 162, 69, 0.12);
+  --flag: #d9705c;
+  --flag-dim: rgba(217, 112, 92, 0.12);
+  --data: #7fafe0;
+  --data-dim: rgba(127, 175, 224, 0.1);
+
+  /* ---------- ambient light (per act) ---------- */
+  --ambient-act1: radial-gradient(1200px 800px at 70% -10%, rgba(127, 175, 224, 0.05), transparent 70%);
+  --ambient-act2: radial-gradient(1000px 700px at 15% 30%, rgba(148, 163, 184, 0.04), transparent 70%);
+  --ambient-act3: radial-gradient(1100px 750px at 80% 90%, rgba(61, 214, 152, 0.04), transparent 70%);
+
+  /* ---------- typography ---------- */
+  --font-display: "Newsreader", ui-serif, Georgia, serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  --t-display: clamp(3.4rem, 7.5vw, 7rem);
+  --t-h1: clamp(2.4rem, 4.5vw, 4rem);
+  --t-h2: clamp(1.6rem, 2.6vw, 2.25rem);
+  --t-h3: 1.25rem;
+  --t-body-lg: 1.125rem;
+  --t-body: 1rem;
+  --t-mono: 0.9375rem;
+  --t-label: 0.75rem;
+  --t-micro: 0.6875rem;
+
+  --leading-display: 1.02;
+  --leading-h1: 1.08;
+  --leading-body: 1.7;
+  --tracking-display: -0.015em;
+  --tracking-label: 0.08em;
+  --measure: 68ch;
+
+  /* ---------- space (8px base) ---------- */
+  --s-1: 4px;  --s-2: 8px;   --s-3: 12px;  --s-4: 16px;
+  --s-5: 24px; --s-6: 32px;  --s-7: 48px;  --s-8: 64px;
+  --s-9: 96px; --s-10: 128px; --s-11: 160px; --s-12: 224px;
+
+  /* ---------- layout ---------- */
+  --content-max: 1280px;
+  --page-margin: clamp(20px, 5vw, 80px);
+  --rail-width: 56px;
+  --gutter: 24px;
+
+  /* ---------- radius ---------- */
+  --r-1: 3px;
+  --r-2: 6px;
+  --r-3: 10px;
+  --r-4: 14px;
+
+  /* ---------- elevation ---------- */
+  --edge-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-e1: 0 16px 40px -24px rgba(0, 0, 0, 0.55);
+  --shadow-e2: 0 24px 64px -24px rgba(0, 0, 0, 0.65);
+
+  /* ---------- motion ---------- */
+  --dur-tick: 120ms;      /* micro feedback: hovers, toggles */
+  --dur-ui: 240ms;        /* standard UI transitions */
+  --dur-stamp: 180ms;     /* seal stamp */
+  --dur-scan: 500ms;      /* underline scan sweep */
+  --dur-reveal: 600ms;    /* content reveals */
+  --dur-cinema: 900ms;    /* chapter transitions, diagram draw */
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);       /* default: decisive arrival */
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);    /* position swaps */
+  --ease-stamp: cubic-bezier(0.34, 1.4, 0.64, 1);  /* tiny overshoot: stamps only */
+  --ease-mech: steps(24, end);                     /* counters: mechanical ticking */
+
+  /* ---------- z ---------- */
+  --z-rail: 40;
+  --z-nav: 50;
+  --z-popover: 60;
+  --z-cursor: 100;
+}
+
+/* Paper mode — /engineering articles only (Phase 5) */
+[data-theme="paper"] {
+  --bg-0: #f7f5f0;
+  --bg-1: #ffffff;
+  --bg-2: #f1ede6;
+  --bg-3: #ffffff;
+  --ink-hi: #1a2330;
+  --ink-md: #46566b;
+  --ink-lo: #7d8ba0;
+  --line: rgba(26, 35, 48, 0.12);
+  --line-strong: rgba(26, 35, 48, 0.24);
+  --seal: #0f9d6a;
+  --seal-dim: rgba(15, 157, 106, 0.1);
+  --caution: #a8721c;
+  --flag: #bf4d38;
+  --data: #3a6ea8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-tick: 0ms;
+    --dur-ui: 0ms;
+    --dur-stamp: 0ms;
+    --dur-scan: 0ms;
+    --dur-reveal: 0ms;
+    --dur-cinema: 0ms;
+  }
+}
