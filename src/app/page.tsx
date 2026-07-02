@@ -24,6 +24,7 @@ import { Button } from "@/components/primitives/Button";
 import { Claim } from "@/components/primitives/Claim";
 import { thesisClaims } from "@/data/claims";
 import { chapters } from "@/data/projects";
+import { site } from "@/data/site";
 import type { ReactNode } from "react";
 
 const visuals: Record<string, ReactNode> = {
@@ -38,9 +39,36 @@ const visuals: Record<string, ReactNode> = {
  * The audit, sections 00–10. 3C ships the evidence act (five chapters +
  * interlude + extended evidence); 02–03 and 06–10 land in 3D.
  */
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Soumyadeb Tripathy",
+  jobTitle: "Backend & AI Systems Engineer",
+  email: `mailto:${site.email}`,
+  url: site.url,
+  sameAs: [
+    "https://github.com/Rexy-5097",
+    "https://www.linkedin.com/in/soumyadeb-tripathy/",
+    "https://leetcode.com/u/ApexRaptor_5097/",
+  ],
+  alumniOf: { "@type": "CollegeOrUniversity", name: "Lovely Professional University" },
+  knowsAbout: [
+    "backend systems",
+    "distributed computing",
+    "applied machine learning",
+    "LLM security",
+    "privacy-preserving computation",
+    "Linux kernel development",
+  ],
+};
+
 export default function Home() {
   return (
     <main id="main">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
       <Section id="landing" className="flex min-h-svh items-center bg-[image:var(--ambient-act1)]">
         <HeroBackdrop />
         <Container className="relative">

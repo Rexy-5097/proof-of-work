@@ -73,7 +73,7 @@ export function SiteNav() {
               key={l.href}
               href={l.href}
               onClick={handleAnchor(l.href)}
-              className="text-sm text-ink-md transition-colors duration-[var(--dur-tick)] hover:text-ink-hi"
+              className="py-2 text-sm text-ink-md transition-colors duration-[var(--dur-tick)] hover:text-ink-hi"
             >
               {l.label}
             </Link>
@@ -82,7 +82,6 @@ export function SiteNav() {
             type="button"
             role="switch"
             aria-checked={enabled}
-            aria-label="Interaction sounds"
             onClick={toggleSound}
             className="mono-label cursor-pointer transition-colors duration-[var(--dur-tick)] hover:text-ink-md"
           >
@@ -122,7 +121,6 @@ export function SiteNav() {
               type="button"
               role="switch"
               aria-checked={enabled}
-              aria-label="Interaction sounds"
               onClick={toggleSound}
               className="mono-label cursor-pointer py-2.5 text-left"
             >

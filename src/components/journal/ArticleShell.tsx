@@ -15,8 +15,26 @@ export function ArticleShell({ slug, children }: { slug: string; children: React
   const prev = journal[idx - 1];
   const next = journal[idx + 1];
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: entry.title,
+    abstract: entry.abstract,
+    datePublished: entry.date,
+    keywords: entry.tags.join(", "),
+    author: {
+      "@type": "Person",
+      name: "Soumyadeb Tripathy",
+      url: "https://github.com/Rexy-5097",
+    },
+  };
+
   return (
     <div id="article-root" className="bg-bg-0 transition-colors duration-[var(--dur-ui)]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <main id="main" className="pt-28 pb-24">
         <Container className="max-w-[820px]">
           <header className="mb-12 border-b border-line pb-8">

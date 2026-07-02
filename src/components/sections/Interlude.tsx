@@ -39,7 +39,7 @@ export function Interlude() {
           </p>
         </Reveal>
 
-        <Reveal delay={2.4}>
+        <Reveal delay={2.4} variant="stamp">
           <p className="mt-12 inline-flex items-center gap-2.5 rounded-r1 border border-flag/50 px-5 py-3 font-mono text-label tracking-[0.08em] text-flag">
             <Seal state="null" size={12} />
             NULL RESULT — PUBLISHED

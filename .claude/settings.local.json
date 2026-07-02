@@ -22,7 +22,12 @@
       "Bash(git commit -q -m 'Phase 3B: verification boot, navigation, audit rail, scroll engine, sound *)",
       "Bash(git commit -q -m 'Phase 3C: evidence chapters — five engineering documentaries + interlude *)",
       "Bash(git commit *)",
-      "Bash(npm uninstall *)"
+      "Bash(npm uninstall *)",
+      "Bash(npx --yes lighthouse http://localhost:3001 --quiet --chrome-flags=\"--headless=new\" --output=json --output-path=/private/tmp/claude-501/-Users-soumyadebtripathy-Portfolio/cc3e5ad6-1c06-4a2e-ac1e-8fa713fe417a/scratchpad/lh-home.json --only-categories=performance,accessibility,best-practices,seo)",
+      "Bash(awk '{printf \"%6.0f KB  %s\\\\n\", $5/1024, $9}')",
+      "Bash(curl -s http://localhost:3001/)",
+      "Bash(npx --yes lighthouse http://localhost:3001 --quiet --preset=desktop --chrome-flags=--headless=new --output=json --output-path=/private/tmp/claude-501/-Users-soumyadebtripathy-Portfolio/cc3e5ad6-1c06-4a2e-ac1e-8fa713fe417a/scratchpad/lh-desktop.json --only-categories=performance)",
+      "Bash(gh repo *)"
     ]
   }
 }

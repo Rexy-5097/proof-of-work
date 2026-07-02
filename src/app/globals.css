@@ -14,7 +14,8 @@
 
   --ink-hi: #e6edf6;
   --ink-md: #9db0c4;
-  --ink-lo: #5f7288;
+  /* 4.5:1+ on every surface incl. bg-2 cards (WCAG AA for 12px labels) */
+  --ink-lo: #6b83a0;
 
   --line: rgba(148, 163, 184, 0.14);
   --line-strong: rgba(148, 163, 184, 0.26);

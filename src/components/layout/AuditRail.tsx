@@ -44,7 +44,7 @@ export function AuditRail() {
                   play("tap");
                 }}
                 aria-current={isCurrent ? "location" : undefined}
-                className="group flex items-center gap-2"
+                className="group flex min-h-6 items-center gap-2 py-0.5"
               >
                 {isVisited ? (
                   <Seal state={isNull ? "null" : "verified"} size={9} />

@@ -48,7 +48,8 @@ export function About() {
                 engineering roles
               </p>
               <p>
-                <span className="text-ink-md">LOCATION</span> — India · remote-ready
+                <span className="text-ink-md">LOCATION</span> — Jalandhar, India ·
+                open to relocation
               </p>
             </div>
           </Reveal>

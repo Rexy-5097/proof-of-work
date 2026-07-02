@@ -42,6 +42,7 @@ export function BootSequence() {
   }, []);
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_DISABLE_BOOT === "1") return;
     if (!animate) return;
     if (sessionStorage.getItem(SESSION_KEY) === "1") return;
     sessionStorage.setItem(SESSION_KEY, "1");

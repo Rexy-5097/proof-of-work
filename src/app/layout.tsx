@@ -19,11 +19,15 @@ const inter = Inter({
   display: "swap",
 });
 
+// display: "optional" — the hero headline is the LCP element; a late
+// webfont swap would re-paint it and inflate LCP on slow connections.
+// Fast connections render Newsreader normally; throttled first visits
+// keep the size-adjusted serif fallback with no repaint.
 const newsreader = Newsreader({
   subsets: ["latin"],
   style: ["normal", "italic"],
   variable: "--font-newsreader",
-  display: "swap",
+  display: "optional",
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -67,7 +71,7 @@ export default function RootLayout({
       <body>
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded-r2 focus:bg-bg-3 focus:px-4 focus:py-2 focus:font-mono focus:text-claim focus:text-ink-hi"
+          className="fixed top-4 left-4 z-100 -translate-y-24 rounded-r2 bg-bg-3 px-4 py-2.5 font-mono text-claim text-ink-hi transition-transform focus:translate-y-0"
         >
           Skip to content
         </a>

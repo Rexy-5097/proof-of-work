@@ -88,7 +88,6 @@ export function Claim({
         <button
           type="button"
           data-cursor="inspect"
-          aria-label={`${claim.label}: ${claim.value}. View evidence.`}
           className={cn(
             "group inline-flex cursor-pointer items-baseline gap-1.5 border-b pb-0.5 font-mono tabular",
             "text-ink-hi transition-colors duration-[var(--dur-tick)] hover:text-white",
@@ -97,10 +96,12 @@ export function Claim({
             className,
           )}
         >
-          <span ref={ref} aria-hidden="true">
-            {display}
+          {/* Visible text IS the accessible name (plus sr-only context), so
+              screen readers and the label-content-name rule agree. */}
+          <span ref={ref}>{display}</span>
+          <span className="sr-only">
+            — {claim.label}. View evidence.
           </span>
-          <span className="sr-only">{claim.value}</span>
           {stamped ? (
             <motion.span
               initial={animate ? { scale: 1.3, opacity: 0 } : false}

@@ -24,16 +24,16 @@ export function Lessons() {
       </Reveal>
       <ol className="max-w-3xl space-y-10">
         {LESSONS.map((lesson, i) => (
-          <Reveal key={lesson} delay={Math.min(i * 0.08, 0.4)}>
-            <li className="flex items-baseline gap-6">
+          <li key={lesson}>
+            <Reveal delay={Math.min(i * 0.08, 0.4)} className="flex items-baseline gap-6">
               <span aria-hidden="true" className="mono-label text-ink-lo tabular">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <p className="font-display text-xl leading-snug text-ink-hi md:text-2xl">
                 {lesson}
               </p>
-            </li>
-          </Reveal>
+            </Reveal>
+          </li>
         ))}
       </ol>
     </Container>

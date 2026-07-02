@@ -20,14 +20,27 @@ export default function Resume() {
     <div data-theme="paper" className="min-h-svh bg-bg-0 text-ink-md print:bg-white">
       <main id="main" className="mx-auto max-w-[52rem] px-6 py-14 print:py-6">
         <header className="border-b border-line-strong pb-5">
-          <h1 className="font-display text-3xl text-ink-hi">Soumyadeb Tripathy</h1>
-          <p className="mt-1 text-sm">
-            Backend systems · Applied AI · Distributed computing
-          </p>
-          <p className="mt-2 font-mono text-micro text-ink-lo">
-            {site.email} · github.com/Rexy-5097 · linkedin.com/in/soumyadeb-tripathy ·{" "}
-            {site.url.replace("https://", "")}
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="font-display text-3xl text-ink-hi">Soumyadeb Tripathy</h1>
+              <p className="mt-1 text-sm">
+                Backend systems · Applied AI · Distributed computing
+              </p>
+              <p className="mt-2 font-mono text-micro text-ink-lo">
+                {site.email} · Jalandhar, India — open to relocation
+              </p>
+              <p className="mt-1 font-mono text-micro text-ink-lo">
+                github.com/Rexy-5097 · linkedin.com/in/soumyadeb-tripathy ·
+                leetcode.com/u/ApexRaptor_5097
+              </p>
+            </div>
+            <a
+              href="/resume.pdf"
+              className="rounded-r2 border border-line-strong px-4 py-2 font-mono text-label tracking-[0.08em] text-ink-hi transition-colors duration-[var(--dur-tick)] hover:border-ink-md print:hidden"
+            >
+              DOWNLOAD PDF ↓
+            </a>
+          </div>
         </header>
 
         <section className="mt-6">
@@ -75,8 +88,17 @@ export default function Resume() {
           <h2 className="mono-label mb-3">EDUCATION</h2>
           <p className="text-sm">
             B.Tech, Computer Science and Engineering — Lovely Professional
-            University <span className="text-ink-lo">(in progress)</span>
+            University <span className="text-ink-lo">(2025 – present)</span>
           </p>
+          <p className="mt-1 text-sm">
+            Higher secondary — Kishorenagar Sachindra Siksha Sadan{" "}
+            <span className="text-ink-lo">(2024)</span>
+          </p>
+        </section>
+
+        <section className="mt-6">
+          <h2 className="mono-label mb-3">LANGUAGES</h2>
+          <p className="text-sm">English · Hindi · Bengali</p>
         </section>
 
         <footer className="mt-8 border-t border-line pt-3 font-mono text-micro text-ink-lo print:hidden">
