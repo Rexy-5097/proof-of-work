@@ -50,7 +50,7 @@ export function SiteNav() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-colors duration-[var(--dur-ui)]",
+        "fixed inset-x-0 top-0 z-50 transition-colors duration-[var(--dur-ui)] print:hidden",
         scrolled ? "border-b border-line bg-bg-0/85 backdrop-blur-md" : "bg-transparent",
       )}
     >

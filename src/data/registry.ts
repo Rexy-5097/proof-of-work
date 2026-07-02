@@ -1,15 +1,16 @@
 import { thesisClaims } from "./claims";
 import { flagshipProjects } from "./projects";
+import { telemetryClaims } from "./telemetry";
 import type { Claim } from "./types";
 
 /**
- * Every claim shipped on the site, aggregated. Data modules append here
- * as they land (telemetry in 3D) so counts shown in the boot sequence
- * and console are computed, never typed by hand.
+ * Every claim shipped on the site, aggregated, so counts shown in the
+ * boot sequence and console are computed, never typed by hand.
  */
 export const allClaims: Claim[] = [
   ...thesisClaims,
   ...flagshipProjects.flatMap((p) => p.claims),
+  ...telemetryClaims,
 ];
 
 export const registry = {

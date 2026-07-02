@@ -1,0 +1,60 @@
+import { ArticleShell } from "@/components/journal/ArticleShell";
+
+export const metadata = {
+  title: "Hidden-state geometry for LLM security",
+  description:
+    "Text filters read what attackers write. GEOFENCE-LLM reads what the model does: trajectory geometry, windowed features, and a fail-closed authority.",
+};
+
+<ArticleShell slug="hidden-state-geometry">
+
+## The problem with reading text
+
+Every text-level jailbreak filter shares one structural weakness: the attacker writes the text. Synonym substitution, base64 wrappers, roleplay prefixes, token smuggling — the entire input surface is under adversarial control, so any classifier trained on that surface is playing a game where the opponent moves last.
+
+[GEOFENCE-LLM](https://github.com/Rexy-5097/GEOFENCE-LLM) starts from a different premise: find a signal the attacker cannot directly author. The candidate is the model's own internal behavior.
+
+## The model as a dynamical system
+
+As a prompt flows through a transformer, each layer re-represents it. Take the hidden states at a fixed set of layers — 5, 10, 15, 20, 24 of Llama-3.2-3B — mean-pool each layer's token representations, and you get a sequence of points: a **trajectory** through representation space.
+
+The hypothesis, tested rather than assumed: adversarial prompts trace geometrically different paths than aligned ones, even when their surface text has been obfuscated past what a text classifier can catch. The features are simple and interpretable:
+
+- **Tortuosity** — path length divided by net displacement. A wandering trajectory scores high.
+- **Energy drift** — how the hidden-state norm changes across layers.
+- **Directional stability** — cosine similarity of successive steps: does the representation keep heading somewhere, or thrash?
+- **Velocity variance** — the spread of step sizes.
+
+## The audit that changed the architecture
+
+The first version computed one global trajectory per prompt. The project's own phase-5.3 hardening audit broke it: global features are sensitive to prompt *length*, and a harmless preamble dilutes an adversarial payload — prepend three paragraphs of small talk and the average geometry looks benign.
+
+The fix was windowing: compute features over sliding windows and aggregate, so a locally-tortuous segment stays visible no matter what surrounds it. The broken design is still documented in the repo's `architecture_hardening.md` — an experiment's failed branches are data, not embarrassment.
+
+## From signal to decision
+
+Geometry alone isn't a security system. The pipeline behind it:
+
+```text
+signals  →  state estimator  →  risk engine  →  authority
+(windowed    NORMAL/UNCERTAIN/    base + trend     ALLOW · SLOW ·
+ geometry)   CONFLICTED/           + volatility     CLARIFY · REFUSE ·
+             ADVERSARIAL/                           HALT
+             UNSTABLE
+```
+
+The authority layer's contract is the part I'd defend in any design review: **fail closed.** An exception, an unrecognized state, a signal that doesn't parse — all resolve to a block, never a silent allow. A security layer that fails open is a decorative layer.
+
+## The honest numbers
+
+On obfuscated prompts that evade the text baseline, the probes reach **recall 0.66 at a 0.48 false-positive rate**. Both numbers are published in the repo, and the second one is disqualifying for production: flagging half of benign traffic makes a standalone filter unusable.
+
+So the README says exactly that. GEOFENCE-LLM is a research direction and a defense-in-depth layer for models you host — not a product. Reporting the 0.66 without the 0.48 would have made a better headline and a worse record.
+
+## Where this goes
+
+Three threads seem worth pulling: better probes than logistic regression on the same features; per-layer contributions (which depths carry the adversarial signature?); and the interaction between trajectory monitoring and generation — the current system scores prompts, but the same lens applies token-by-token during decoding.
+
+The premise held up well enough to keep working on: attackers can rewrite text endlessly, but they can only reach the model *through* the computation — and the computation leaves a trail.
+
+</ArticleShell>

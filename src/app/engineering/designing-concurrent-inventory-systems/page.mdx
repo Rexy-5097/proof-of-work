@@ -1,0 +1,68 @@
+import { ArticleShell } from "@/components/journal/ArticleShell";
+
+export const metadata = {
+  title: "Designing concurrent inventory systems",
+  description:
+    "One invariant — stock is never oversold — defended through idempotency keys, a Redis queue, and a row-locking Postgres transaction.",
+};
+
+<ArticleShell slug="designing-concurrent-inventory-systems">
+
+## Start from the invariant
+
+[FurnitureOps](https://github.com/Rexy-5097/FurnitureOps) exists to defend one sentence: **stock is never oversold — under concurrent purchases, retries, and partial failures.** Everything else in the system is negotiable; this isn't. Writing the invariant down first turned every later design argument into a simple question: does this defend the sentence or not?
+
+## Why the obvious design fails
+
+The obvious design decrements stock in the request handler:
+
+```sql
+UPDATE inventory SET quantity = quantity - 1 WHERE id = $1;
+```
+
+Under concurrency this is already a race if any check precedes it — two buyers read `quantity = 1`, both pass the check, both decrement. But the deeper failures come from the messy edges of real traffic:
+
+- **Retries.** A client times out and resends. The purchase applies twice.
+- **Duplicates.** A double-click, a flaky network layer, a replayed webhook.
+- **Partial failure.** The process dies after charging intent but before the write — or after the write but before the response, which triggers a retry, which double-applies.
+
+Optimistic locking in application code handles the first race and none of the rest. The failure modes that matter live *between* requests, not within one.
+
+## The shape that works
+
+Three layers, each defending a different edge:
+
+**1. Idempotency at the door.** Every purchase carries a client-generated key. The API checks it against Redis before anything else; a replay gets the original response instead of a second effect. Retries become safe by definition.
+
+**2. A queue instead of a synchronous write.** Accepted purchases go onto a Redis list. This decouples user latency from database contention and gives failure handling a natural home: the worker that drains the queue has retries with backoff, a circuit breaker that stops hammering a struggling database, and a dead-letter queue for jobs that exhaust their attempts. A crashed worker loses nothing — the job is still in the queue.
+
+**3. The invariant lives in Postgres.** The worker applies changes through one RPC:
+
+```sql
+-- decrement_stock_atomic(), abridged
+SELECT quantity FROM inventory WHERE id = item_id FOR UPDATE;
+-- validate: quantity >= requested
+UPDATE inventory SET quantity = quantity - requested WHERE id = item_id;
+INSERT INTO audit_logs (item_id, delta, job_id, ...) VALUES (...);
+-- COMMIT — stock change and audit entry are one atomic fact
+```
+
+`SELECT … FOR UPDATE` serializes writers on the row. The stock check happens *inside* the lock, so there is no check-then-write window. The audit log rides in the same transaction: if the decrement happened, the record of it happened.
+
+One detail that earns its keep: the worker sorts each batch by item id before processing, so two workers can never hold locks in conflicting order — deadlock avoided by convention rather than detected by timeout.
+
+## The costs, stated plainly
+
+- **Eventual consistency.** A purchase is *accepted*, then *applied*. The UI has to speak that language honestly.
+- **Serialized hot items.** A single popular item processes one write at a time. That's not a flaw; it's the invariant, made visible.
+- **The rate limiter fails open.** If Redis is unreachable, edge rate limiting logs a warning and lets traffic through — a full outage in exchange for a cache outage is a bad trade. This is safe *only because* the invariant doesn't live there. Know which layers are load-bearing.
+
+## Verification is part of the design
+
+The repo ships [19 dedicated scripts](https://github.com/Rexy-5097/FurnitureOps/tree/main/scripts): concurrency floods, idempotency replays, RLS probes, load tests, chaos runs that kill the worker mid-batch. None of them prove the system correct — tests can't do that. What they do is fail loudly whenever a refactor weakens the design. Correctness is designed; the tests stand guard over the design.
+
+## The transferable lesson
+
+Pick the sentence that must stay true. Push it down to the layer that can't be bypassed. Let every layer above it fail — and design *for* those failures instead of hoping around them.
+
+</ArticleShell>

@@ -1,7 +1,16 @@
 import { Container, Section } from "@/components/layout/Section";
 import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
+import { About } from "@/components/sections/About";
+import { Principles } from "@/components/sections/Principles";
 import { Interlude } from "@/components/sections/Interlude";
 import { ExtendedEvidence } from "@/components/sections/ExtendedEvidence";
+import { Timeline } from "@/components/sections/Timeline";
+import { Ledger } from "@/components/sections/Ledger";
+import { Capabilities } from "@/components/sections/Capabilities";
+import { Beyond } from "@/components/sections/Beyond";
+import { Telemetry } from "@/components/sections/Telemetry";
+import { Lessons } from "@/components/sections/Lessons";
+import { Contact } from "@/components/sections/Contact";
 import { ChapterShell } from "@/components/chapters/ChapterShell";
 import { EvidenceNav } from "@/components/chapters/EvidenceNav";
 import { FurnitureOpsFlow } from "@/components/chapters/visuals/FurnitureOpsFlow";
@@ -79,22 +88,15 @@ export default function Home() {
         </Container>
       </Section>
 
-      {/* 02–03 land in 3D; anchors stay stable for navigation. */}
-      {(
-        [
-          ["about", "02", "THE ENGINEER"],
-          ["principles", "03", "OPERATING CONSTRAINTS"],
-        ] as const
-      ).map(([id, number, label]) => (
-        <Section key={id} id={id}>
-          <Container>
-            <SectionLabel number={number} label={label} />
-            <p className="mt-4 font-mono text-micro text-ink-lo">
-              SECTION UNDER CONSTRUCTION — PHASE 3D
-            </p>
-          </Container>
-        </Section>
-      ))}
+      <Section id="about" labelledBy="about-h">
+        <span id="about-h" className="sr-only">About the engineer</span>
+        <About />
+      </Section>
+
+      <Section id="principles" labelledBy="principles-h">
+        <span id="principles-h" className="sr-only">Operating constraints</span>
+        <Principles />
+      </Section>
 
       <Section id="evidence" labelledBy="evidence-h" className="bg-[image:var(--ambient-act2)] !py-0">
         <Container className="pt-20 lg:pt-28">
@@ -120,24 +122,32 @@ export default function Home() {
         <Interlude />
       </Section>
 
-      {(
-        [
-          ["timeline", "06", "TRAJECTORY"],
-          ["index", "07", "THE LEDGER"],
-          ["capabilities", "08", "INSTRUMENTATION"],
-          ["telemetry", "09", "TELEMETRY"],
-          ["contact", "10", "OPEN CHANNEL"],
-        ] as const
-      ).map(([id, number, label]) => (
-        <Section key={id} id={id}>
-          <Container>
-            <SectionLabel number={number} label={label} />
-            <p className="mt-4 font-mono text-micro text-ink-lo">
-              SECTION UNDER CONSTRUCTION — PHASE 3D
-            </p>
-          </Container>
-        </Section>
-      ))}
+      <Section id="timeline" labelledBy="timeline-h" className="bg-[image:var(--ambient-act3)]">
+        <span id="timeline-h" className="sr-only">Trajectory</span>
+        <Timeline />
+      </Section>
+
+      <Section id="index" labelledBy="ledger-h">
+        <span id="ledger-h" className="sr-only">Engineering ledger — all repositories</span>
+        <Ledger />
+      </Section>
+
+      <Section id="capabilities" labelledBy="capabilities-h">
+        <span id="capabilities-h" className="sr-only">Instrumentation — capabilities and interests</span>
+        <Capabilities />
+        <Beyond />
+      </Section>
+
+      <Section id="telemetry" labelledBy="telemetry-h">
+        <span id="telemetry-h" className="sr-only">Engineering telemetry</span>
+        <Telemetry />
+        <Lessons />
+      </Section>
+
+      <Section id="contact" labelledBy="contact-h" className="pb-28 lg:pb-36">
+        <span id="contact-h" className="sr-only">Open channel — contact</span>
+        <Contact />
+      </Section>
     </main>
   );
 }

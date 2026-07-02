@@ -8,6 +8,7 @@ import { SiteNav } from "@/components/layout/SiteNav";
 import { AuditRail } from "@/components/layout/AuditRail";
 import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import { BootSequence } from "@/components/boot/BootSequence";
+import { Footer } from "@/components/layout/Footer";
 import { ConsoleGreeting } from "@/components/chrome/ConsoleGreeting";
 import { site } from "@/data/site";
 import "./globals.css";
@@ -79,6 +80,7 @@ export default function RootLayout({
                 <SiteNav />
                 <AuditRail />
                 {children}
+                <Footer />
                 <ConsoleGreeting />
               </AuditProgressProvider>
             </LenisProvider>

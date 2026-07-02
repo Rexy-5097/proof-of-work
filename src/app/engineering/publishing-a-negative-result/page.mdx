@@ -1,0 +1,49 @@
+import { ArticleShell } from "@/components/journal/ArticleShell";
+
+export const metadata = {
+  title: "Lessons from publishing a negative result",
+  description:
+    "What closing Helios-Dx honestly — a capacity-matched quantum-vs-classical study that found no advantage — taught me about engineering discipline.",
+};
+
+<ArticleShell slug="publishing-a-negative-result">
+
+## The question
+
+[Helios-Dx](https://github.com/Rexy-5097/Helios-Dx) asked something specific: do variational quantum circuits offer any advantage over classical layers for privacy-preserving medical inference under fully homomorphic encryption constraints?
+
+The setup made the question answerable. A frozen ConvNeXt-Tiny backbone extracts features; an aggressive bottleneck reduces 768 dimensions to 4 so the trainable head — roughly 30 parameters — fits homomorphic compilation with Concrete-ML. The only variable is the head itself: a plain `Linear(4 → 2)` against a 4-qubit variational circuit with strongly entangling layers. Same optimizer, same seeds, same data. Capacity-matched by construction.
+
+## The answer
+
+No consistent quantum advantage was observed. The two heads were functionally equivalent in capacity and performance, and the quantum head cost more to run under simulation.
+
+That sentence took months to earn, and there were three ways to write it up:
+
+- **Reframe it** — "a novel hybrid quantum-classical pipeline for encrypted medical inference." Every word technically true, and the framing a lie.
+- **Abandon it** — let the repo trail off with no conclusion, like most experiments that disappoint.
+- **Close it** — lead the README with the disclaimers, tag v1.0, add a `CITATION.cff`, and stop.
+
+I closed it. The README's first section is a warning box: *this project reports null results; no quantum advantage is claimed; simulation-only; not clinically validated.*
+
+## What the discipline bought
+
+**The negative is informative.** Anyone considering VQC heads under FHE constraints for small classification tasks can read one repository and skip the experiment. That is the entire value proposition of publishing research, applied to a result that happens to be a "no."
+
+**It changed how I design experiments.** Knowing the result would be published either way forced the design to be defensible either way: capacity-matching, fixed seeds, an explicit split between the classical client and the quantum-FHE server. When you might have to publish "nothing happened," you make sure "nothing" is measured well enough to mean something.
+
+**It calibrated every other claim.** After you have published a null result, "78% accuracy" on another project reads differently — because the reader knows you would have said 52% just as plainly. My [ASTRA](https://github.com/Rexy-5097/ASTRA) README flags its weakest class (Solar-like, F1 0.52) as not production-ready. That habit came from Helios-Dx.
+
+## The uncomfortable part
+
+Publishing a null result feels like publishing a failure, and for about a week it did. The reframing option was genuinely tempting — the pipeline *was* novel, the engineering *was* real, and nobody audits a student project.
+
+The counterargument that won: an engineering record is an instrument, and an instrument that only reads high is broken. If the record can't say "no," its "yes" means nothing.
+
+## A closing note on scope
+
+Honesty includes the limits of the study itself. Helios-Dx ran on PennyLane's `default.mixed` simulator, not quantum hardware; four qubits is tiny; one dataset family. The null result is scoped to exactly that. It doesn't prove quantum ML useless — it proves this configuration offered nothing, and says so in a way someone else can build on.
+
+Closed at v1.0. Citable. Done.
+
+</ArticleShell>
