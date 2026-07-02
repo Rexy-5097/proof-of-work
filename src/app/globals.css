@@ -210,6 +210,67 @@
   }
 }
 
+/* ---- evidence-visual stage grammar (see hooks/useViz.ts) ----
+   Default = finished diagram (no-JS truth). [data-armed] hides stages,
+   [data-run] plays them. Stage delays via data-d="1..6". */
+.viz .draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset var(--dur-cinema) var(--ease-inout-pow);
+}
+.viz[data-armed] .draw {
+  stroke-dashoffset: 1;
+}
+.viz[data-run] .draw {
+  stroke-dashoffset: 0;
+}
+.viz .rise {
+  opacity: 1;
+  transition:
+    opacity var(--dur-reveal) var(--ease-out-pow),
+    transform var(--dur-reveal) var(--ease-out-pow);
+}
+.viz[data-armed] .rise {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.viz[data-run] .rise {
+  opacity: 1;
+  transform: none;
+}
+.viz .bar {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  transition: transform var(--dur-cinema) var(--ease-out-pow);
+}
+.viz[data-armed] .bar {
+  transform: scaleY(0);
+}
+.viz[data-run] .bar {
+  transform: scaleY(1);
+}
+.viz [data-d="1"] { transition-delay: 120ms; }
+.viz [data-d="2"] { transition-delay: 280ms; }
+.viz [data-d="3"] { transition-delay: 440ms; }
+.viz [data-d="4"] { transition-delay: 600ms; }
+.viz [data-d="5"] { transition-delay: 760ms; }
+.viz [data-d="6"] { transition-delay: 920ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .viz .draw,
+  .viz[data-armed] .draw {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+  .viz[data-armed] .rise {
+    opacity: 1;
+    transform: none;
+  }
+  .viz[data-armed] .bar {
+    transform: none;
+  }
+}
+
 /* ---- shared utilities that tokens alone can't express ---- */
 @utility panel-e1 {
   background-color: var(--bg-2);

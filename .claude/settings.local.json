@@ -19,7 +19,9 @@
       "Bash(git commit -q -m 'Phase 3A: foundation — design tokens, evidence type system, core primitives *)",
       "Bash(curl -s http://localhost:3000/)",
       "Bash(python3 -)",
-      "Bash(git commit -q -m 'Phase 3B: verification boot, navigation, audit rail, scroll engine, sound *)"
+      "Bash(git commit -q -m 'Phase 3B: verification boot, navigation, audit rail, scroll engine, sound *)",
+      "Bash(git commit -q -m 'Phase 3C: evidence chapters — five engineering documentaries + interlude *)",
+      "Bash(git commit *)"
     ]
   }
 }
