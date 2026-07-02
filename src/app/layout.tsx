@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Newsreader } from "next/font/google";
 import { MotionPrefsProvider } from "@/components/providers/MotionPrefsProvider";
+import { LenisProvider } from "@/components/providers/LenisProvider";
+import { SoundProvider } from "@/components/providers/SoundProvider";
+import { AuditProgressProvider } from "@/components/providers/AuditProgressProvider";
+import { SiteNav } from "@/components/layout/SiteNav";
+import { AuditRail } from "@/components/layout/AuditRail";
+import { ScrollProgress } from "@/components/layout/ScrollProgress";
+import { BootSequence } from "@/components/boot/BootSequence";
+import { ConsoleGreeting } from "@/components/chrome/ConsoleGreeting";
 import { site } from "@/data/site";
 import "./globals.css";
 
@@ -62,7 +70,20 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <MotionPrefsProvider>{children}</MotionPrefsProvider>
+        <MotionPrefsProvider>
+          <SoundProvider>
+            <LenisProvider>
+              <AuditProgressProvider>
+                <BootSequence />
+                <ScrollProgress />
+                <SiteNav />
+                <AuditRail />
+                {children}
+                <ConsoleGreeting />
+              </AuditProgressProvider>
+            </LenisProvider>
+          </SoundProvider>
+        </MotionPrefsProvider>
       </body>
     </html>
   );

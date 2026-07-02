@@ -120,7 +120,7 @@ export function Claim({
           side="top"
           sideOffset={8}
           collisionPadding={16}
-          className="panel-e2 z-60 outline-none data-[state=open]:animate-in"
+          className="panel-e2 z-60 outline-none data-[state=open]:animate-[pop-in_var(--dur-tick)_var(--ease-out-pow)] data-[state=closed]:animate-[pop-out_var(--dur-tick)_ease-out]"
         >
           <Provenance claim={claim} />
           <Popover.Arrow className="fill-bg-3" />

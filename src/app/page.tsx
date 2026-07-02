@@ -1,4 +1,5 @@
 import { Container, Section } from "@/components/layout/Section";
+import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { SectionLabel } from "@/components/primitives/SectionLabel";
 import { Button } from "@/components/primitives/Button";
 import { Claim } from "@/components/primitives/Claim";
@@ -14,7 +15,8 @@ export default function Home() {
   return (
     <main id="main">
       <Section id="landing" className="flex min-h-svh items-center bg-[image:var(--ambient-act1)]">
-        <Container>
+        <HeroBackdrop />
+        <Container className="relative">
           <p className="mono-label mb-6 tracking-[0.14em]">PROOF OF WORK</p>
           <h1
             className="max-w-[17ch] font-display text-[length:var(--t-display)] leading-[1.02] tracking-[-0.015em] text-ink-hi"
