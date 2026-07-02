@@ -23,7 +23,7 @@ export function ConsoleGreeting() {
         `  Last build               ${built}\n` +
         `  Evidence chain           COMPLETE\n` +
         `${line}\n` +
-        `  Welcome, Engineer. Source: github.com/Rexy-5097\n` +
+        `  Welcome, Engineer. Source: github.com/Rexy-5097/proof-of-work\n` +
         `${line}`,
       "font-family: monospace; color: #3dd698;",
     );

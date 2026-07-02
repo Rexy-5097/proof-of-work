@@ -51,12 +51,12 @@ export function Footer() {
               <dt className="inline text-ink-md">SOURCE </dt>
               <dd className="inline">
                 <a
-                  href={site.github}
+                  href={site.repo}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-data hover:text-ink-hi"
                 >
-                  github.com/Rexy-5097 ↗
+                  Rexy-5097/proof-of-work ↗
                 </a>
               </dd>
             </div>
