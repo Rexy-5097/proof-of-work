@@ -321,12 +321,118 @@ html.pow-rippling::view-transition-new(root) {
   }
 }
 
+/* ============================================================
+   Custom cursor (design/06-motion.md §5). Pointer-fine only, mounted
+   only when CursorProvider decides it should be — this CSS is inert
+   otherwise. transform-only, one shared rAF loop drives both elements.
+   ============================================================ */
+.pow-cursor-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+.pow-cursor-dot,
+.pow-cursor-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  will-change: transform;
+}
+.pow-cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--ink-hi);
+}
+.pow-cursor-ring {
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border: 1px solid var(--line-strong);
+  transition:
+    width 150ms var(--ease-out-pow),
+    height 150ms var(--ease-out-pow),
+    margin 150ms var(--ease-out-pow),
+    border-color 150ms var(--ease-out-pow),
+    border-radius 150ms var(--ease-out-pow),
+    opacity 150ms var(--ease-out-pow);
+}
+.pow-cursor-ring[data-mode="link"] {
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border-color: var(--data);
+}
+.pow-cursor-ring[data-mode="inspect"] {
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: 6px;
+  border-style: dashed;
+  border-color: var(--ink-md);
+}
+.pow-cursor-ring[data-mode="crosshair"] {
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 2px;
+  border-color: var(--data);
+  opacity: 0.7;
+}
+
+/* Suppress the native cursor only over elements that opt in — never
+   globally, never over text, never on touch (this rule only ever
+   applies while CursorProvider has mounted .pow-cursor-layer). */
+body:has(.pow-cursor-layer) [data-cursor] {
+  cursor: none;
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .pow-cursor-layer {
+    display: none;
+  }
+}
+
 /* ---- shared utilities that tokens alone can't express ---- */
 @utility panel-e1 {
   background-color: var(--bg-2);
   border: 1px solid var(--line);
   border-radius: var(--radius-r3);
   box-shadow: var(--edge-highlight), var(--shadow-e1);
+  position: relative;
+  isolation: isolate;
+}
+
+/* Cursor-as-weak-light-source on evidence panels (design/02-visual-
+   language.md §5). One document-level pointermove listener (see
+   CardGlowLayer) writes --mx/--my in percent onto whichever panel the
+   pointer is over; this pseudo-element just reads them. No listener
+   ⇒ no glow ⇒ the panel looks identical to before, so this is free on
+   touch/reduced-motion/no-JS. */
+@utility panel-e1-glow-target {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      480px circle at var(--mx, 50%) var(--my, 50%),
+      var(--data-dim),
+      transparent 60%
+    );
+    transition: opacity 200ms var(--ease-out-pow);
+  }
+  &[data-glow="1"]::before {
+    opacity: 1;
+  }
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 @utility panel-e2 {

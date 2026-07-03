@@ -1,27 +1,13 @@
 /**
  * Blueprint construction layer behind the hero (design brief 3B).
  * Server-rendered, zero JS: a fine grid, construction guides, and a
- * "repository topology" — 17 nodes, one per public repo, grouped and
- * connected by engineering theme. Ambient drift is a single slow CSS
- * transform, removed under prefers-reduced-motion.
+ * "repository topology" — 17 nodes, one per public repo. This is the
+ * real content and the no-JS/reduced-motion fallback; once mounted,
+ * HeroParticleNetwork's canvas takes over the same graph and hides
+ * this static one (see its `hero-topology-static` id below).
  */
-
-// Deterministic layout: [x, y] per repo, clustered by category.
-// backend cluster (left-mid), ai/research (upper-right), systems (low-left),
-// product (right), practice (lower-right).
-const NODES: ReadonlyArray<readonly [number, number]> = [
-  [180, 300], [240, 350], [150, 390],            // backend: furnitureops, nexus, crypto
-  [640, 120], [720, 170], [580, 90], [690, 80],  // ai: geofence, astra, helios, aegis-edge
-  [130, 520], [220, 560],                        // systems: ddso, resonance
-  [820, 300], [880, 360], [790, 400],            // product: apexos, zkhealth, raptor
-  [430, 240],                                    // hub: profile
-  [560, 470], [640, 520], [860, 520], [300, 140],// career, aegis-cmd, productivity, dsa
-];
-
-const EDGES: ReadonlyArray<readonly [number, number]> = [
-  [0, 1], [1, 2], [0, 13], [3, 13], [4, 3], [5, 3], [6, 4],
-  [7, 8], [7, 0], [9, 10], [10, 11], [11, 13], [13, 16], [14, 15], [11, 14],
-];
+import { TOPOLOGY_NODES as NODES, TOPOLOGY_EDGES as EDGES, TOPOLOGY_HUB_INDEX } from "@/data/repoTopology";
+import { HeroParticleNetwork } from "./HeroParticleNetwork";
 
 export function HeroBackdrop() {
   return (
@@ -40,8 +26,10 @@ export function HeroBackdrop() {
       <div className="absolute top-0 bottom-0 left-[var(--page-margin)] w-px bg-line opacity-60" />
       <div className="absolute top-[22%] right-0 left-0 h-px bg-line opacity-40" />
 
-      {/* repository topology */}
+      {/* repository topology — static SSR truth; hidden by JS once the
+          canvas layer (same graph, gentle procedural drift) takes over */}
       <svg
+        id="hero-topology-static"
         viewBox="0 0 1000 640"
         className="absolute inset-0 h-full w-full opacity-[0.5] motion-safe:animate-[drift_60s_ease-in-out_infinite_alternate]"
         preserveAspectRatio="xMidYMid slice"
@@ -58,7 +46,7 @@ export function HeroBackdrop() {
         </g>
         <g fill="var(--ink-lo)">
           {NODES.map(([x, y], i) => (
-            <circle key={i} cx={x} cy={y} r={i === 13 ? 2.5 : 1.5} />
+            <circle key={i} cx={x} cy={y} r={i === TOPOLOGY_HUB_INDEX ? 2.5 : 1.5} />
           ))}
         </g>
         {/* crosshair construction mark on the hub node */}
@@ -67,6 +55,8 @@ export function HeroBackdrop() {
           <line x1={430} y1={228} x2={430} y2={252} />
         </g>
       </svg>
+
+      <HeroParticleNetwork />
     </div>
   );
 }

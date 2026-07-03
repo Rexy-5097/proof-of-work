@@ -6,8 +6,9 @@ import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
 
 interface VizState<T extends Element> {
   ref: RefObject<T | null>;
-  /** Spread onto the root: `data-armed` hides stages, `data-run` plays them. */
-  attrs: { "data-armed"?: ""; "data-run"?: "" };
+  /** Spread onto the root: `data-armed` hides stages, `data-run` plays them,
+   *  `data-cursor="crosshair"` gives diagrams the precision-pointer mode. */
+  attrs: { "data-armed"?: ""; "data-run"?: ""; "data-cursor": "crosshair" };
   /** True while the visual should actively animate (SMIL dots, loops). */
   running: boolean;
 }
@@ -30,6 +31,7 @@ export function useViz<T extends Element = SVGSVGElement>(threshold = 0.35): Viz
   return {
     ref,
     attrs: {
+      "data-cursor": "crosshair",
       ...(armed ? { "data-armed": "" as const } : {}),
       ...(running ? { "data-run": "" as const } : {}),
     },

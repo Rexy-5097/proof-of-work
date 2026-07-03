@@ -77,7 +77,7 @@ export function ChapterShell({
 
           <div className="lg:col-span-7">
             <Reveal delay={0.15}>
-              <div className="panel-e1 p-5 md:p-6">
+              <div className="panel-e1 panel-e1-glow-target p-5 md:p-6">
                 {visual}
 
                 <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-5">
