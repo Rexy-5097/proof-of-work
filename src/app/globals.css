@@ -11,6 +11,9 @@
   --bg-1: #0b111b;
   --bg-2: #101826;
   --bg-3: #16202f;
+  /* the interlude's "recede further" surface — a hair past bg-0 in
+     whichever direction this theme's bg-0 already leans */
+  --bg-quiet: #05080d;
 
   --ink-hi: #e6edf6;
   --ink-md: #9db0c4;
@@ -60,21 +63,44 @@
   --ease-stamp: cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
+/* Light theme + Paper reading mode share one palette (design/03-tokens.css
+   §Paper mode). All accent/ink values below were verified ≥4.5:1 against
+   bg-0/bg-1/bg-2 (WCAG AA, incl. 12px mono labels on the tightest
+   surface) — see the contrast pass in the Phase "signature transition"
+   commit; do not restore the original lighter hexes without re-checking. */
+[data-theme="light"],
 [data-theme="paper"] {
   --bg-0: #f7f5f0;
   --bg-1: #ffffff;
   --bg-2: #f1ede6;
   --bg-3: #ffffff;
+  --bg-quiet: #efebe2;
+
   --ink-hi: #1a2330;
   --ink-md: #46566b;
-  --ink-lo: #7d8ba0;
+  --ink-lo: #57677f;
+
   --line: rgba(26, 35, 48, 0.12);
   --line-strong: rgba(26, 35, 48, 0.24);
-  --seal: #0f9d6a;
-  --seal-dim: rgba(15, 157, 106, 0.1);
-  --caution: #a8721c;
-  --flag: #bf4d38;
-  --data: #3a6ea8;
+  --line-seal: rgba(10, 122, 81, 0.35);
+
+  --seal: #0a7a51;
+  --seal-bright: #086a46;
+  --seal-dim: rgba(10, 122, 81, 0.1);
+  --caution: #8a5d18;
+  --caution-dim: rgba(138, 93, 24, 0.1);
+  --flag: #b2452f;
+  --flag-dim: rgba(178, 69, 47, 0.1);
+  --data: #2f5f96;
+  --data-dim: rgba(47, 95, 150, 0.08);
+
+  --ambient-act1: radial-gradient(1200px 800px at 70% -10%, rgba(47, 95, 150, 0.05), transparent 70%);
+  --ambient-act2: radial-gradient(1000px 700px at 15% 30%, rgba(26, 35, 48, 0.04), transparent 70%);
+  --ambient-act3: radial-gradient(1100px 750px at 80% 90%, rgba(10, 122, 81, 0.05), transparent 70%);
+
+  --edge-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --shadow-e1: 0 16px 40px -24px rgba(26, 35, 48, 0.18);
+  --shadow-e2: 0 24px 64px -24px rgba(26, 35, 48, 0.24);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -88,9 +114,32 @@
   }
 }
 
+/* ============================================================
+   Signature theme transition — droplet + ripple (RIPPLE verb)
+   The mask/filter values below are hand-driven every frame from
+   lib/ripple.ts via CSS custom properties and SVG attribute writes —
+   not CSS @keyframes — so the "physics" comes from JS, not the browser's
+   built-in crossfade. See ThemeProvider.tsx for the orchestration.
+   Scoped entirely to html.pow-rippling so it costs nothing outside a
+   transition and is fully absent for the instant-swap (reduced-motion
+   or unsupported-browser) fallback.
+   ============================================================ */
+html.pow-rippling::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.pow-rippling::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  mask-image: var(--ripple-mask, none);
+  -webkit-mask-image: var(--ripple-mask, none);
+  filter: url(#pow-ripple-distort) drop-shadow(0 0 5px rgba(255, 255, 255, 0.16));
+}
+
 /* ---- expose tokens to Tailwind utilities ---- */
 @theme inline {
   --color-bg-0: var(--bg-0);
+  --color-bg-quiet: var(--bg-quiet);
   --color-bg-1: var(--bg-1);
   --color-bg-2: var(--bg-2);
   --color-bg-3: var(--bg-3);

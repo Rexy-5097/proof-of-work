@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { Seal } from "@/components/primitives/Seal";
 import { useSound } from "@/components/providers/SoundProvider";
+import { useTheme } from "@/components/providers/ThemeProvider";
 import { useLenis } from "@/components/providers/LenisProvider";
 
 const links = [
@@ -19,6 +20,7 @@ export function SiteNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { enabled, setEnabled, play } = useSound();
+  const { theme, toggleTheme } = useTheme();
   const { scrollTo } = useLenis();
   const pathname = usePathname();
 
@@ -45,6 +47,12 @@ export function SiteNav() {
     setEnabled(next);
     // Confirm the new state audibly only when turning ON (a gesture).
     if (next) play("toggle");
+  };
+
+  const handleThemeToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    toggleTheme({ x: e.clientX, y: e.clientY });
+    play("toggle");
+    setMenuOpen(false);
   };
 
   return (
@@ -90,6 +98,16 @@ export function SiteNav() {
               {enabled ? "ON" : "OFF"}
             </span>
           </button>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={theme === "light"}
+            aria-label="Toggle light and dark theme"
+            onClick={handleThemeToggle}
+            className="mono-label cursor-pointer transition-colors duration-[var(--dur-tick)] hover:text-ink-md"
+          >
+            THEME <span className="text-ink-hi">{theme === "light" ? "LIGHT" : "DARK"}</span>
+          </button>
         </div>
 
         <button
@@ -128,6 +146,16 @@ export function SiteNav() {
               <span className={cn("ml-1.5", enabled ? "text-seal" : "text-ink-lo")}>
                 {enabled ? "ON" : "OFF"}
               </span>
+            </button>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={theme === "light"}
+              aria-label="Toggle light and dark theme"
+              onClick={handleThemeToggle}
+              className="mono-label cursor-pointer py-2.5 text-left"
+            >
+              THEME <span className="text-ink-hi">{theme === "light" ? "LIGHT" : "DARK"}</span>
             </button>
           </div>
         </div>

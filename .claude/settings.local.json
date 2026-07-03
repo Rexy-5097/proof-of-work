@@ -33,7 +33,14 @@
       "Bash(npx --yes vercel link --yes --project proof-of-work)",
       "Bash(npx --yes vercel deploy --prod --yes)",
       "Bash(npx --yes vercel ls proof-of-work)",
-      "Bash(npx --yes vercel project ls)"
+      "Bash(npx --yes vercel project ls)",
+      "Bash(awk '{print $4, $5}')",
+      "Bash(npx --yes lighthouse https://proof-of-work-roan.vercel.app --quiet --chrome-flags=--headless=new --output=json --output-path=/private/tmp/claude-501/-Users-soumyadebtripathy-Portfolio/cc3e5ad6-1c06-4a2e-ac1e-8fa713fe417a/scratchpad/lh-live.json --only-categories=performance,accessibility,best-practices,seo)",
+      "Bash(git push *)",
+      "Bash(grep -rEn \"#[0-9a-fA-F]{3,8}\" src/components src/app --include=\"*.tsx\" --include=\"*.ts\")",
+      "Bash(npx eslint *)",
+      "Bash(lsof -ti:3001)",
+      "Bash(xargs kill -9)"
     ]
   }
 }

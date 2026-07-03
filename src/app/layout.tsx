@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Newsreader } from "next/font/google";
 import { MotionPrefsProvider } from "@/components/providers/MotionPrefsProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { SoundProvider } from "@/components/providers/SoundProvider";
 import { AuditProgressProvider } from "@/components/providers/AuditProgressProvider";
@@ -69,6 +70,15 @@ export default function RootLayout({
       className={`${inter.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
     >
       <body>
+        {/* No-flash theme script: must run before first paint, so it's a
+            plain synchronous inline script ahead of everything else —
+            not a React effect, which would run after hydration paints. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('pow-theme');if(t==='light')document.documentElement.dataset.theme='light';}catch(e){}})();",
+          }}
+        />
         <a
           href="#main"
           className="fixed top-4 left-4 z-100 -translate-y-24 rounded-r2 bg-bg-3 px-4 py-2.5 font-mono text-claim text-ink-hi transition-transform focus:translate-y-0"
@@ -76,19 +86,21 @@ export default function RootLayout({
           Skip to content
         </a>
         <MotionPrefsProvider>
-          <SoundProvider>
-            <LenisProvider>
-              <AuditProgressProvider>
-                <BootSequence />
-                <ScrollProgress />
-                <SiteNav />
-                <AuditRail />
-                {children}
-                <Footer />
-                <ConsoleGreeting />
-              </AuditProgressProvider>
-            </LenisProvider>
-          </SoundProvider>
+          <ThemeProvider>
+            <SoundProvider>
+              <LenisProvider>
+                <AuditProgressProvider>
+                  <BootSequence />
+                  <ScrollProgress />
+                  <SiteNav />
+                  <AuditRail />
+                  {children}
+                  <Footer />
+                  <ConsoleGreeting />
+                </AuditProgressProvider>
+              </LenisProvider>
+            </SoundProvider>
+          </ThemeProvider>
         </MotionPrefsProvider>
       </body>
     </html>

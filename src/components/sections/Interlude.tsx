@@ -12,7 +12,7 @@ import { helios } from "@/data/projects";
  */
 export function Interlude() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-[#05080d] py-24 text-center">
+    <div className="flex min-h-svh flex-col items-center justify-center bg-bg-quiet py-24 text-center">
       <Container className="max-w-3xl">
         <Reveal>
           <p className="mono-label mb-12 tracking-[0.14em] text-ink-lo">
