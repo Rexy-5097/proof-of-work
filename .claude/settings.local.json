@@ -40,7 +40,11 @@
       "Bash(grep -rEn \"#[0-9a-fA-F]{3,8}\" src/components src/app --include=\"*.tsx\" --include=\"*.ts\")",
       "Bash(npx eslint *)",
       "Bash(lsof -ti:3001)",
-      "Bash(xargs kill -9)"
+      "Bash(xargs kill -9)",
+      "Bash('intentional requirement. *)",
+      "Bash(node -e \"console.log\\('three', require\\('./node_modules/three/package.json'\\).version\\)\")",
+      "Bash(grep -rn \"return window\\\\|return skip\\\\|=> window.dispatchEvent\\\\|matches;$\" src/components src/app)",
+      "Bash(awk '{print $5, $9}')"
     ]
   }
 }

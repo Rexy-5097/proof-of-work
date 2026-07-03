@@ -18,7 +18,7 @@ export function Telemetry() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {telemetryClaims.map((claim, i) => (
           <Reveal key={claim.id} delay={Math.min(i * 0.05, 0.35)}>
-            <div className="panel-e1 panel-e1-glow-target flex h-full flex-col p-5">
+            <div className="panel-e1 flex h-full flex-col p-5">
               <p className="mono-label text-[0.6875rem]">{claim.label}</p>
               <p className="mt-3 mb-2">
                 <Claim claim={claim} size="lg" />

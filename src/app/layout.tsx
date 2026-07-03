@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Newsreader } from "next/font/google";
 import { MotionPrefsProvider } from "@/components/providers/MotionPrefsProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { CursorProvider } from "@/components/providers/CursorProvider";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { SoundProvider } from "@/components/providers/SoundProvider";
 import { AuditProgressProvider } from "@/components/providers/AuditProgressProvider";
@@ -12,7 +11,7 @@ import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import { BootSequence } from "@/components/boot/BootSequence";
 import { Footer } from "@/components/layout/Footer";
 import { ConsoleGreeting } from "@/components/chrome/ConsoleGreeting";
-import { CardGlowLayer } from "@/components/chrome/CardGlowLayer";
+import { BackgroundScene } from "@/components/webgl/BackgroundScene";
 import { site } from "@/data/site";
 import "./globals.css";
 
@@ -89,22 +88,20 @@ export default function RootLayout({
         </a>
         <MotionPrefsProvider>
           <ThemeProvider>
-            <CursorProvider>
-              <SoundProvider>
-                <LenisProvider>
-                  <AuditProgressProvider>
-                    <BootSequence />
-                    <ScrollProgress />
-                    <SiteNav />
-                    <AuditRail />
-                    {children}
-                    <Footer />
-                    <ConsoleGreeting />
-                    <CardGlowLayer />
-                  </AuditProgressProvider>
-                </LenisProvider>
-              </SoundProvider>
-            </CursorProvider>
+            <SoundProvider>
+              <LenisProvider>
+                <AuditProgressProvider>
+                  <BackgroundScene />
+                  <BootSequence />
+                  <ScrollProgress />
+                  <SiteNav />
+                  <AuditRail />
+                  {children}
+                  <Footer />
+                  <ConsoleGreeting />
+                </AuditProgressProvider>
+              </LenisProvider>
+            </SoundProvider>
           </ThemeProvider>
         </MotionPrefsProvider>
       </body>

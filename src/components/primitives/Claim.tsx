@@ -87,7 +87,6 @@ export function Claim({
       <Popover.Trigger asChild>
         <button
           type="button"
-          data-cursor="inspect"
           className={cn(
             "group inline-flex cursor-pointer items-baseline gap-1.5 border-b pb-0.5 font-mono tabular",
             "text-ink-hi transition-colors duration-[var(--dur-tick)] hover:text-white",

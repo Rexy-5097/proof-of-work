@@ -2,12 +2,12 @@
  * Blueprint construction layer behind the hero (design brief 3B).
  * Server-rendered, zero JS: a fine grid, construction guides, and a
  * "repository topology" — 17 nodes, one per public repo. This is the
- * real content and the no-JS/reduced-motion fallback; once mounted,
- * HeroParticleNetwork's canvas takes over the same graph and hides
- * this static one (see its `hero-topology-static` id below).
+ * real content and the no-JS / reduced-motion fallback. When the global
+ * WebGL particle field mounts (webgl/index.tsx), it hides the animated
+ * topology SVG (`#hero-topology-static`) so the two don't overlap; the
+ * grid and guides stay as the blueprint frame under the particles.
  */
 import { TOPOLOGY_NODES as NODES, TOPOLOGY_EDGES as EDGES, TOPOLOGY_HUB_INDEX } from "@/data/repoTopology";
-import { HeroParticleNetwork } from "./HeroParticleNetwork";
 
 export function HeroBackdrop() {
   return (
@@ -55,8 +55,6 @@ export function HeroBackdrop() {
           <line x1={430} y1={228} x2={430} y2={252} />
         </g>
       </svg>
-
-      <HeroParticleNetwork />
     </div>
   );
 }

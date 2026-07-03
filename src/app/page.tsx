@@ -1,5 +1,6 @@
 import { Container, Section } from "@/components/layout/Section";
 import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
+import { HeroDissolveLayer } from "@/components/webgl/HeroDissolveLayer";
 import { About } from "@/components/sections/About";
 import { Principles } from "@/components/sections/Principles";
 import { Interlude } from "@/components/sections/Interlude";
@@ -73,10 +74,14 @@ export default function Home() {
         <HeroBackdrop />
         <Container className="relative">
           <p className="mono-label mb-6 tracking-[0.14em]">PROOF OF WORK</p>
-          <h1 className="max-w-[17ch] font-display text-[length:var(--t-display)] leading-[1.02] tracking-[-0.015em] text-ink-hi">
+          <h1
+            id="hero-headline"
+            className="max-w-[17ch] font-display text-[length:var(--t-display)] leading-[1.02] tracking-[-0.015em] text-ink-hi"
+          >
             I build software that stays correct when things fail — and I publish
             the evidence.
           </h1>
+          <HeroDissolveLayer />
           <p className="mt-6 text-lg text-ink-md">
             Backend systems · Applied AI · Distributed computing
           </p>

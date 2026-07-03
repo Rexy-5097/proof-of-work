@@ -39,12 +39,21 @@ export function BootSequence() {
     timers.current.forEach(clearTimeout);
     timers.current = [];
     setActive(false);
+    // Tell the WebGL scene (and anything else waiting on the curtain) that
+    // the opaque boot overlay is gone, so its opening animation plays in
+    // view rather than hidden behind the curtain.
+    window.dispatchEvent(new Event("pow:ready"));
   }, []);
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_DISABLE_BOOT === "1") return;
-    if (!animate) return;
-    if (sessionStorage.getItem(SESSION_KEY) === "1") return;
+    const willSkip =
+      process.env.NEXT_PUBLIC_DISABLE_BOOT === "1" ||
+      !animate ||
+      sessionStorage.getItem(SESSION_KEY) === "1";
+    if (willSkip) {
+      window.dispatchEvent(new Event("pow:ready"));
+      return;
+    }
     sessionStorage.setItem(SESSION_KEY, "1");
     setActive(true);
     document.documentElement.style.overflow = "hidden";
