@@ -1,6 +1,7 @@
 import { thesisClaims } from "./claims";
 import { flagshipProjects } from "./projects";
 import { telemetryClaims } from "./telemetry";
+import { ledger } from "./ledger";
 import type { Claim } from "./types";
 
 /**
@@ -14,7 +15,10 @@ export const allClaims: Claim[] = [
 ];
 
 export const registry = {
-  repositories: 17,
+  // Derived from the ledger, not typed: this number is rendered in the
+  // intro readout and the console banner, and a hardcoded copy had
+  // already drifted (17) from the archive it describes.
+  repositories: ledger.length,
   verifiedClaims: allClaims.length,
   evidenceLinks: allClaims.reduce((n, c) => n + c.evidence.length, 0),
   nullResults: allClaims.filter((c) => c.verdict === "null").length,
