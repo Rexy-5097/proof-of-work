@@ -56,14 +56,17 @@ export function Ledger() {
       });
   }, [filter, query, sort]);
 
+  // Derived, never typed: the footer cannot drift from the array above.
+  const deployedCount = useMemo(() => ledger.filter((e) => e.live).length, []);
+
   return (
     <Container>
       <Reveal>
         <SectionLabel number="07" label="ENGINEERING LEDGER" as="h2" className="mb-4" />
         <p className="mb-8 max-w-[var(--measure)] text-ink-md">
-          The complete archive — all 17 public repositories, nothing curated
-          out. Five appear above as examined cases; the ledger holds the rest
-          of the record.
+          The complete public archive, nothing curated out — including work
+          that is still in progress or governance-only. The examined cases
+          above appear here too, linked back to their deep dives.
         </p>
       </Reveal>
 
@@ -180,8 +183,8 @@ export function Ledger() {
           </table>
         </div>
         <p className="mt-4 font-mono text-micro text-ink-lo">
-          TOTAL: {rows.length}/{ledger.length} ENTRIES · 8 LANGUAGES · 4 DEPLOYED ·
-          SOURCE: github.com/Rexy-5097
+          TOTAL: {rows.length}/{ledger.length} ENTRIES · {deployedCount} WITH A LIVE
+          DEPLOYMENT · SOURCE: github.com/Rexy-5097
         </p>
       </Reveal>
     </Container>

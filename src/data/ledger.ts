@@ -30,8 +30,68 @@ export interface LedgerEntry {
 
 const GH = "https://github.com/Rexy-5097";
 
-/** All 17 public repositories — the complete archive, nothing curated out. */
+/** Every public repository except the profile README — the complete
+ *  archive, nothing curated out, including work that is still governance-
+ *  only. Counts rendered on the site derive from this array's length. */
 export const ledger: LedgerEntry[] = [
+  {
+    name: "AdityaNet",
+    oneLiner: "Verifiable research platform over the Aditya-L1 solar X-ray archive; published null result",
+    stack: ["Astro", "TypeScript", "Python", "uPlot"],
+    category: "research",
+    status: "deployed",
+    year: "2026",
+    repo: `${GH}/AdityaNet`,
+    live: "https://adityanet-re1t.onrender.com",
+    caseAnchor: "#case-adityanet",
+  },
+  {
+    name: "cartograph",
+    oneLiner: "Local-first cross-language architecture graph with evidence on every edge",
+    stack: ["Rust", "tree-sitter", "petgraph"],
+    category: "systems",
+    status: "active",
+    year: "2026",
+    repo: `${GH}/cartograph`,
+    caseAnchor: "#case-cartograph",
+  },
+  {
+    name: "StockSphere",
+    oneLiner: "Warehouse management platform as a modular monolith with a forecasting service",
+    stack: ["Fastify", "Drizzle", "Next.js", "TimescaleDB"],
+    category: "backend",
+    status: "active",
+    year: "2026",
+    repo: `${GH}/StockSphere_Project`,
+  },
+  {
+    name: "raptors-way",
+    oneLiner: "Packaged AgentOS template repository for governed, design-first project setup",
+    stack: ["Python", "Make"],
+    category: "tooling",
+    status: "active",
+    year: "2026",
+    repo: `${GH}/raptors-way`,
+  },
+  {
+    name: "proof-of-work",
+    oneLiner: "This portfolio — every rendered claim links to the artifact that produced it",
+    stack: ["Next.js", "TypeScript", "Tailwind", "MDX"],
+    category: "product",
+    status: "deployed",
+    year: "2026",
+    repo: `${GH}/proof-of-work`,
+    live: "https://proof-of-work-roan.vercel.app",
+  },
+  {
+    name: "Aaroh",
+    oneLiner: "Constraint-aware career decision engine — governance only; no application code yet",
+    stack: ["Not yet selected"],
+    category: "tooling",
+    status: "active",
+    year: "2026",
+    repo: `${GH}/Aaroh`,
+  },
   {
     name: "ASTRA",
     oneLiner: "Audited ML pipeline classifying variable stars from TESS light curves",
@@ -185,7 +245,7 @@ export const ledger: LedgerEntry[] = [
     status: "deployed",
     year: "2026",
     repo: `${GH}/productivity-system`,
-    live: "http://skill-deploy-afgh58eago.vercel.app",
+    live: "https://skill-deploy-afgh58eago.vercel.app",
   },
   {
     name: "DSA-Practice-500",

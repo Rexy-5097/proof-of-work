@@ -44,7 +44,8 @@
       "Bash('intentional requirement. *)",
       "Bash(node -e \"console.log\\('three', require\\('./node_modules/three/package.json'\\).version\\)\")",
       "Bash(grep -rn \"return window\\\\|return skip\\\\|=> window.dispatchEvent\\\\|matches;$\" src/components src/app)",
-      "Bash(awk '{print $5, $9}')"
+      "Bash(awk '{print $5, $9}')",
+      "Bash(curl -s \"https://api.github.com/users/Rexy-5097/repos?per_page=100&sort=pushed\")"
     ]
   }
 }

@@ -26,9 +26,19 @@ const CARDS = [
       { label: "LIVE", href: "https://zkhealth-live-2026.netlify.app/login" },
     ],
   },
+  {
+    name: "STOCKSPHERE",
+    oneLiner: "A warehouse platform built as a modular monolith, not a microservice sprawl.",
+    points: [
+      "Fastify + Drizzle over PostgreSQL for transactions, TimescaleDB for time-series logs, Redis for cache and queue, MinIO for documents.",
+      "Forecasting is a separate Python service (Prophet, XGBoost) so the transactional path never waits on a model.",
+    ],
+    stack: "Fastify · Drizzle · Next.js · TimescaleDB",
+    links: [{ label: "REPO", href: "https://github.com/Rexy-5097/StockSphere_Project" }],
+  },
 ] as const;
 
-/** Two cases held in reserve — condensed, qualitative, fully linked. */
+/** Cases held in reserve — condensed, qualitative, fully linked. */
 export function ExtendedEvidence() {
   return (
     <Container className="border-t border-line py-16 lg:py-20">
@@ -37,7 +47,7 @@ export function ExtendedEvidence() {
           EXTENDED EVIDENCE <span className="text-ink-lo">/ HELD IN RESERVE</span>
         </p>
       </Reveal>
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {CARDS.map((card, i) => (
           <Reveal key={card.name} delay={i * 0.08}>
             <div className="flex h-full flex-col rounded-r3 border border-line bg-bg-1 p-6">

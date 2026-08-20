@@ -68,11 +68,27 @@ export const timeline: TimelineStage[] = [
     repos: ["ASTRA"],
   },
   {
+    date: "JUL 2026",
+    domain: "VERIFIABLE RESEARCH",
+    title: "Evidence, enforced by the build.",
+    detail:
+      "A research platform over the Aditya-L1 solar X-ray archive where no figure is typed by a person — every number resolves from a committed artifact, and CI fails the build if one drifts. It published a null result.",
+    repos: ["AdityaNet"],
+  },
+  {
+    date: "AUG 2026",
+    domain: "PROGRAM ANALYSIS",
+    title: "Compiler problems, in Rust.",
+    detail:
+      "Cartograph resolves a call chain across three languages — partial evaluation of dynamic URLs, route canonicalisation, symbol-level matching — and refuses to draw an edge it cannot evidence.",
+    repos: ["cartograph"],
+  },
+  {
     date: "NEXT",
     domain: "FUTURE WORK",
     title: "Toward publication.",
     detail:
-      "Backend and AI-systems roles; taking one research thread — hidden-state security or the ASTRA pipeline — toward formal peer review.",
+      "Software engineering internships and new-grad roles. Cartograph is pre-alpha at M06 of 17 and continues; one research thread is headed toward formal write-up.",
     repos: [],
   },
 ];

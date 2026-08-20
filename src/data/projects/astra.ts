@@ -6,7 +6,7 @@ const DATASET_HASH = "f99b4b06f16952033b5445bb0682d059e9ea4c3f99320a05d31aebb25c
 export const astra: Project = {
   slug: "astra",
   name: "ASTRA",
-  caseNumber: 4,
+  caseNumber: 6,
   oneLiner: "Classifying variable stars with a pipeline that audits itself.",
   problem:
     "TESS produces light curves by the hundred thousand; classifying stellar variability by hand does not scale, and ML results in the literature are notoriously hard to reproduce — metrics logged during training quietly drift from what the shipped weights actually do.",

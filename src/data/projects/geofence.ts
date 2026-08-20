@@ -5,7 +5,7 @@ const R = "https://github.com/Rexy-5097/GEOFENCE-LLM";
 export const geofence: Project = {
   slug: "geofence-llm",
   name: "GEOFENCE-LLM",
-  caseNumber: 3,
+  caseNumber: 4,
   oneLiner: "Jailbreak detection that attackers can't paraphrase around.",
   problem:
     "Text-level jailbreak filters are brittle: synonym substitution, encodings, and adversarial prefixes are all authored by the attacker, and all defeat classifiers that only read the prompt. Detection needs a signal the attacker cannot directly write.",

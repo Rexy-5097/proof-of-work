@@ -10,9 +10,9 @@ const GH = "https://github.com/Rexy-5097";
 export const telemetryClaims: Claim[] = [
   {
     id: "tel-repos",
-    value: "17",
-    label: "REPOSITORIES",
-    detail: "public repositories, Nov 2025 – Jun 2026",
+    value: "23",
+    label: "PUBLIC REPOSITORIES",
+    detail: "every public repo except the profile README, Nov 2025 – Aug 2026",
     verdict: "verified",
     evidence: [
       { label: "github profile", href: `${GH}?tab=repositories`, kind: "profile", verifiedAt: "2026-07-02" },
@@ -20,11 +20,12 @@ export const telemetryClaims: Claim[] = [
   },
   {
     id: "tel-research",
-    value: "3",
+    value: "4",
     label: "RESEARCH SYSTEMS",
-    detail: "ASTRA · GEOFENCE-LLM · Helios-Dx — reproducible, audited, one closed with citation metadata",
+    detail: "AdityaNet · ASTRA · GEOFENCE-LLM · Helios-Dx — reproducible and audited; two published null results",
     verdict: "verified",
     evidence: [
+      { label: "AdityaNet", href: `${GH}/AdityaNet`, kind: "readme", verifiedAt: "2026-08-21" },
       { label: "ASTRA", href: `${GH}/ASTRA`, kind: "readme", verifiedAt: "2026-07-02" },
       { label: "GEOFENCE-LLM", href: `${GH}/GEOFENCE-LLM`, kind: "readme", verifiedAt: "2026-07-02" },
       { label: "Helios-Dx", href: `${GH}/Helios-Dx`, kind: "readme", verifiedAt: "2026-07-02" },
@@ -32,11 +33,12 @@ export const telemetryClaims: Claim[] = [
   },
   {
     id: "tel-deploys",
-    value: "4",
+    value: "7",
     label: "LIVE DEPLOYMENTS",
-    detail: "ASTRA platform · FurnitureOps · zkhealth · DDSO dashboard",
+    detail: "AdityaNet · ASTRA · FurnitureOps · zkhealth · DDSO · productivity dashboard · this site",
     verdict: "deployed",
     evidence: [
+      { label: "adityanet (render)", href: "https://adityanet-re1t.onrender.com", kind: "code", verifiedAt: "2026-08-21" },
       { label: "astra-platform (vercel)", href: "https://astra-platform-wine.vercel.app", kind: "code", verifiedAt: "2026-07-02" },
       { label: "furniture-ops (vercel)", href: "https://furniture-ops.vercel.app", kind: "code", verifiedAt: "2026-07-02" },
       { label: "zkhealth (netlify)", href: "https://zkhealth-live-2026.netlify.app/login", kind: "code", verifiedAt: "2026-07-02" },
@@ -78,9 +80,9 @@ export const telemetryClaims: Claim[] = [
   },
   {
     id: "tel-langs",
-    value: "8",
-    label: "LANGUAGES IN PRODUCTION USE",
-    detail: "Python · TypeScript · JavaScript · C · C++ · Solidity · Go · SQL",
+    value: "9",
+    label: "LANGUAGES IN PROJECT WORK",
+    detail: "Rust · Python · TypeScript · JavaScript · C · C++ · Solidity · Go · SQL",
     verdict: "verified",
     evidence: [
       { label: "github profile", href: GH, kind: "profile", verifiedAt: "2026-07-02" },
