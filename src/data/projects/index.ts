@@ -1,14 +1,28 @@
+import { adityanet } from "./adityanet";
+import { cartograph } from "./cartograph";
 import { furnitureops } from "./furnitureops";
-import { nexus } from "./nexus";
 import { geofence } from "./geofence";
+import { nexus } from "./nexus";
 import { astra } from "./astra";
 import { ddso } from "./ddso";
 import { helios } from "./helios";
 import { assertEvidence } from "../assert";
 import type { Project } from "../types";
 
-/** The five examined cases, in audit order. Helios is the interlude. */
-export const chapters: Project[] = [furnitureops, nexus, geofence, astra, ddso];
+/**
+ * The examined cases, in audit order — newest and strongest first, so a
+ * reviewer meets the current work before the archive. Helios is the
+ * interlude and is deliberately not a numbered case.
+ */
+export const chapters: Project[] = [
+  adityanet,
+  cartograph,
+  furnitureops,
+  geofence,
+  nexus,
+  astra,
+  ddso,
+];
 
 export { helios };
 

@@ -35,18 +35,34 @@ export const capabilities: CapabilityDomain[] = [
   },
   {
     domain: "RESEARCH ENGINEERING",
-    technologies: ["reproducible pipelines", "dataset fingerprinting", "ground-truth audits", "cross-validation across seeds", "null-result reporting", "CITATION.cff"],
+    technologies: [
+      "reproducible pipelines",
+      "digest-addressed datasets",
+      "build-time evidence gates",
+      "ground-truth audits",
+      "bootstrap confidence intervals",
+      "null-result reporting",
+    ],
     provenBy: [
+      { name: "AdityaNet", href: `${GH}/AdityaNet` },
       { name: "ASTRA", href: `${GH}/ASTRA` },
       { name: "Helios-Dx", href: `${GH}/Helios-Dx` },
     ],
   },
   {
-    domain: "SYSTEMS PROGRAMMING",
-    technologies: ["C", "C++17", "Linux kernel modules", "block-layer schedulers", "ftrace tracepoints"],
+    domain: "SYSTEMS & PROGRAM ANALYSIS",
+    technologies: [
+      "Rust",
+      "tree-sitter",
+      "static analysis (symbol extraction, route canonicalisation)",
+      "C",
+      "C++17",
+      "Linux kernel modules",
+      "ftrace tracepoints",
+    ],
     provenBy: [
+      { name: "cartograph", href: `${GH}/cartograph` },
       { name: "DDSO", href: `${GH}/DDSO` },
-      { name: "DSA-Practice-500", href: `${GH}/DSA-Practice-500` },
     ],
   },
   {

@@ -5,9 +5,10 @@ import { Claim } from "@/components/primitives/Claim";
 import { VerdictBadge } from "@/components/primitives/VerdictBadge";
 import { DecisionRecordItem } from "@/components/primitives/DecisionRecordItem";
 import { Button } from "@/components/primitives/Button";
+import { chapters } from "@/data/projects";
 import type { Project } from "@/data/types";
 
-const TOTAL_CASES = 5;
+const TOTAL_CASES = chapters.length;
 
 /**
  * One chapter of the audit. Every flagship follows the same rhythm:
@@ -75,10 +76,22 @@ export function ChapterShell({
             </Reveal>
           </div>
 
-          <div className="lg:col-span-7">
+          {/* min-w-0: a grid item defaults to min-width:auto, which would let
+              the 600px figure widen the page instead of scrolling inside it. */}
+          <div className="min-w-0 lg:col-span-7">
             <Reveal delay={0.15}>
               <div className="panel-e1 p-5 md:p-6">
-                {visual}
+                {/* Diagrams carry ~8px labels at their native 640-unit width.
+                    Letting them shrink to a phone's ~290px renders that text
+                    at ~4px, so the panel scrolls horizontally instead and the
+                    figure stays readable. No effect on desktop, where the
+                    panel is already wider than the minimum. */}
+                <div className="-mx-1 overflow-x-auto px-1 pb-1 md:overflow-x-visible">
+                  <div className="min-w-[600px] md:min-w-0">{visual}</div>
+                </div>
+                <p className="mono-label mt-2 text-[0.625rem] md:hidden" aria-hidden="true">
+                  SCROLL FIGURE →
+                </p>
 
                 <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-5">
                   {p.claims.map((c) => (

@@ -44,9 +44,9 @@ export const thesisClaims: Claim[] = [
   },
   {
     id: "thesis-systems",
-    value: "17",
+    value: "23",
     label: "SYSTEMS SHIPPED",
-    detail: "public repositories: kernel module to publication-grade ML, Nov 2025 – Jun 2026",
+    detail: "public repositories: Rust program analysis to publication-grade research, Nov 2025 – Aug 2026",
     verdict: "verified",
     evidence: [
       {
@@ -59,11 +59,18 @@ export const thesisClaims: Claim[] = [
   },
   {
     id: "thesis-null",
-    value: "1",
-    label: "NULL RESULT PUBLISHED",
-    detail: "Helios-Dx: no consistent quantum advantage observed — closed at v1.0, citable",
+    value: "2",
+    label: "NULL RESULTS PUBLISHED",
+    detail:
+      "AdityaNet: ML gives no gain over a threshold detector. Helios-Dx: no quantum advantage. Both published at full weight.",
     verdict: "null",
     evidence: [
+      {
+        label: "AdityaNet findings",
+        href: "https://adityanet-re1t.onrender.com/findings/",
+        kind: "report",
+        verifiedAt: "2026-08-21",
+      },
       {
         label: "Helios-Dx disclaimers",
         href: `${GH}/Helios-Dx#%EF%B8%8F-important-disclaimers`,

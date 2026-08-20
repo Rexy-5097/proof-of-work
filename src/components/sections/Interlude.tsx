@@ -23,13 +23,13 @@ export function Interlude() {
           </p>
         </Reveal>
 
-        <Reveal delay={1.1}>
+        <Reveal delay={0.5}>
           <p className="mt-10 font-display text-[length:var(--t-h2)] leading-snug text-ink-md italic">
             We published the result anyway.
           </p>
         </Reveal>
 
-        <Reveal delay={2}>
+        <Reveal delay={0.95}>
           <p className="mx-auto mt-12 max-w-[52ch] text-[0.9375rem] leading-relaxed text-ink-lo">
             Research integrity is measured by reporting what is true, not what
             is convenient. Helios-Dx ran a capacity-matched comparison — same
@@ -39,14 +39,14 @@ export function Interlude() {
           </p>
         </Reveal>
 
-        <Reveal delay={2.4} variant="stamp">
+        <Reveal delay={1.25} variant="stamp">
           <p className="mt-12 inline-flex items-center gap-2.5 rounded-r1 border border-flag/50 px-5 py-3 font-mono text-label tracking-[0.08em] text-flag">
             <Seal state="null" size={12} />
             NULL RESULT — PUBLISHED
           </p>
         </Reveal>
 
-        <Reveal delay={2.7}>
+        <Reveal delay={1.5}>
           <div className="mt-14 flex flex-wrap items-start justify-center gap-x-12 gap-y-6 border-t border-line pt-8">
             {helios.claims.map((c) => (
               <div key={c.id} className="text-left">

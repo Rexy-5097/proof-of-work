@@ -1,6 +1,9 @@
 import { Container, Section } from "@/components/layout/Section";
 import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
-import { HeroDissolveLayer } from "@/components/webgl/HeroDissolveLayer";
+import { Spotlight } from "@/components/effects/Spotlight";
+import { TextGenerate } from "@/components/effects/TextGenerate";
+import { TracingBeam } from "@/components/effects/TracingBeam";
+import { ActMarker } from "@/components/effects/ActMarker";
 import { About } from "@/components/sections/About";
 import { Principles } from "@/components/sections/Principles";
 import { Interlude } from "@/components/sections/Interlude";
@@ -14,6 +17,8 @@ import { Lessons } from "@/components/sections/Lessons";
 import { Contact } from "@/components/sections/Contact";
 import { ChapterShell } from "@/components/chapters/ChapterShell";
 import { EvidenceNav } from "@/components/chapters/EvidenceNav";
+import { AdityaNetVerdict } from "@/components/chapters/visuals/AdityaNetVerdict";
+import { CartographChain } from "@/components/chapters/visuals/CartographChain";
 import { FurnitureOpsFlow } from "@/components/chapters/visuals/FurnitureOpsFlow";
 import { RtbWaterfall } from "@/components/chapters/visuals/RtbWaterfall";
 import { GeofenceTrajectory } from "@/components/chapters/visuals/GeofenceTrajectory";
@@ -29,6 +34,8 @@ import { site } from "@/data/site";
 import type { ReactNode } from "react";
 
 const visuals: Record<string, ReactNode> = {
+  adityanet: <AdityaNetVerdict />,
+  cartograph: <CartographChain />,
   furnitureops: <FurnitureOpsFlow />,
   "nexus-rtb-engine": <RtbWaterfall />,
   "geofence-llm": <GeofenceTrajectory />,
@@ -36,10 +43,7 @@ const visuals: Record<string, ReactNode> = {
   ddso: <DdsoSeekGraph />,
 };
 
-/**
- * The audit, sections 00–10. 3C ships the evidence act (five chapters +
- * interlude + extended evidence); 02–03 and 06–10 land in 3D.
- */
+/** The audit: sections 00–10, evidence-first. */
 const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
@@ -54,11 +58,14 @@ const personJsonLd = {
   ],
   alumniOf: { "@type": "CollegeOrUniversity", name: "Lovely Professional University" },
   knowsAbout: [
+    "systems programming",
+    "Rust",
+    "static program analysis",
     "backend systems",
     "distributed computing",
     "applied machine learning",
+    "reproducible research",
     "LLM security",
-    "privacy-preserving computation",
     "Linux kernel development",
   ],
 };
@@ -70,18 +77,20 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
       />
-      <Section id="landing" className="flex min-h-svh items-center bg-[image:var(--ambient-act1)]">
+      {/* overflow-hidden: the Spotlight is deliberately larger than the
+          viewport and offset, so its container must clip it (as Aceternity's
+          own demo does) or it widens the document by a few pixels. */}
+      <Section id="landing" className="flex min-h-svh items-center overflow-hidden bg-[image:var(--ambient-act1)]">
         <HeroBackdrop />
+        <Spotlight className="-top-40 left-0 md:-top-20 md:left-60" />
         <Container className="relative">
           <p className="mono-label mb-6 tracking-[0.14em]">PROOF OF WORK</p>
           <h1
             id="hero-headline"
             className="max-w-[17ch] font-display text-[length:var(--t-display)] leading-[1.02] tracking-[-0.015em] text-ink-hi"
           >
-            I build software that stays correct when things fail — and I publish
-            the evidence.
+            <TextGenerate words="I build software that stays correct when things fail — and I publish the evidence." />
           </h1>
-          <HeroDissolveLayer />
           <p className="mt-6 text-lg text-ink-md">
             Backend systems · Applied AI · Distributed computing
           </p>
@@ -132,21 +141,22 @@ export default function Home() {
       </Section>
 
       <Section id="evidence" labelledBy="evidence-h" className="bg-[image:var(--ambient-act2)] !py-0">
-        <Container className="pt-20 lg:pt-28">
-          <Reveal>
-            <SectionLabel number="04" label="EVIDENCE" as="h2" className="mb-4" />
-            <span id="evidence-h" className="sr-only">Evidence — five examined cases</span>
-            <p className="mb-8 max-w-[var(--measure)] font-display text-[length:var(--t-h2)] leading-[1.2] text-ink-hi">
-              Five systems, examined the way an auditor would.
-            </p>
-          </Reveal>
+        <Container>
+          <ActMarker
+            act="ACT II"
+            title="The Evidence"
+            line={`${chapters.length} systems, examined the way an auditor would — problem, invariant, architecture, verified result, and the limitation each one still carries.`}
+          />
         </Container>
+        <span id="evidence-h" className="sr-only">Evidence — examined cases</span>
         <Container className="!max-w-none px-0">
           <EvidenceNav />
         </Container>
-        {chapters.map((p) => (
-          <ChapterShell key={p.slug} project={p} visual={visuals[p.slug]} />
-        ))}
+        <TracingBeam>
+          {chapters.map((p) => (
+            <ChapterShell key={p.slug} project={p} visual={visuals[p.slug]} />
+          ))}
+        </TracingBeam>
         <ExtendedEvidence />
       </Section>
 
@@ -157,6 +167,13 @@ export default function Home() {
 
       <Section id="timeline" labelledBy="timeline-h" className="bg-[image:var(--ambient-act3)]">
         <span id="timeline-h" className="sr-only">Trajectory</span>
+        <Container>
+          <ActMarker
+            act="ACT III"
+            title="The Verdict"
+            line="What the record adds up to: how the work escalated, everything in the archive, and what I am looking for next."
+          />
+        </Container>
         <Timeline />
       </Section>
 

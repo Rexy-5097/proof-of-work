@@ -2,7 +2,7 @@ export const site = {
   name: "Soumyadeb Tripathy",
   title: "Soumyadeb Tripathy — Proof of Work",
   description:
-    "I build software that stays correct when things fail — and I publish the evidence. Backend systems, applied AI, and distributed computing, verified claim by claim.",
+    "I build software that stays correct when things fail — and I publish the evidence. Systems programming in Rust, backend engineering, and verifiable research — every claim on this site links to the artifact behind it.",
   url: "https://proof-of-work-roan.vercel.app",
   email: "soumyadeb043@gmail.com",
   github: "https://github.com/Rexy-5097",

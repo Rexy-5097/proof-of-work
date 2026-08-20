@@ -5,7 +5,7 @@ const R = "https://github.com/Rexy-5097/FurnitureOps";
 export const furnitureops: Project = {
   slug: "furnitureops",
   name: "FurnitureOps",
-  caseNumber: 1,
+  caseNumber: 3,
   oneLiner: "One invariant, defended end to end.",
   problem:
     "A naive stock decrement is a race condition: two buyers read the same count, both succeed, and the shop oversells. Handling it at the API layer alone does not survive retried requests, duplicate submissions, or a worker that crashes mid-transaction.",

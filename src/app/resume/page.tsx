@@ -48,10 +48,10 @@ export default function Resume() {
           <p className="text-sm leading-relaxed">
             Computer science engineer focused on software that stays correct
             under concurrency, partial failure, and adversarial input — with
-            claims that survive independent verification. Shipped 17 public
-            systems in eight months, from a Linux kernel I/O scheduler to a
-            fully audited astrophysics ML pipeline; published one null result
-            rather than reframing it.
+            claims that survive independent verification. Shipped 23 public
+            repositories in ten months, from a Linux kernel I/O scheduler and a
+            Rust cross-language analysis engine to audited research platforms;
+            published two null results rather than reframing them.
           </p>
         </section>
 

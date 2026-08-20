@@ -11,7 +11,6 @@ import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import { BootSequence } from "@/components/boot/BootSequence";
 import { Footer } from "@/components/layout/Footer";
 import { ConsoleGreeting } from "@/components/chrome/ConsoleGreeting";
-import { BackgroundScene } from "@/components/webgl/BackgroundScene";
 import { site } from "@/data/site";
 import "./globals.css";
 
@@ -69,6 +68,10 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
+      // The no-flash script below intentionally sets data-theme on <html>
+      // before React hydrates, so the server markup (no attribute) and the
+      // client DOM (attribute present) legitimately differ on this element.
+      suppressHydrationWarning
     >
       <body>
         {/* No-flash theme script: must run before first paint, so it's a
@@ -91,7 +94,6 @@ export default function RootLayout({
             <SoundProvider>
               <LenisProvider>
                 <AuditProgressProvider>
-                  <BackgroundScene />
                   <BootSequence />
                   <ScrollProgress />
                   <SiteNav />

@@ -28,6 +28,7 @@ export type Verdict =
   | "verified"
   | "null"
   | "experimental"
+  | "active"
   | "deployed"
   | "research"
   | "closed"

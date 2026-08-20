@@ -5,7 +5,7 @@ const R = "https://github.com/Rexy-5097/DDSO";
 export const ddso: Project = {
   slug: "ddso",
   name: "DDSO",
-  caseNumber: 5,
+  caseNumber: 7,
   oneLiner: "An I/O scheduler that rewrites its own strategy.",
   problem:
     "No single disk-scheduling algorithm wins everywhere: FIFO is fair but seek-blind, SSTF minimizes head travel but starves distant requests, batching helps sequential loads and hurts random ones. Workloads change at runtime; static schedulers don't.",

@@ -5,7 +5,7 @@ const R = "https://github.com/Rexy-5097/nexus-rtb-engine";
 export const nexus: Project = {
   slug: "nexus-rtb-engine",
   name: "Nexus-RTB",
-  caseNumber: 2,
+  caseNumber: 5,
   oneLiner: "Every microsecond and every unit of budget accounted for.",
   problem:
     "A real-time bidding engine gets one bid request and a hard deadline. It must predict click-through, conversion, and clearing price, decide a bid that is economically sound, and enforce budget discipline — all inside a latency budget where a slow answer is the same as no answer.",
