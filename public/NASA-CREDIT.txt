@@ -1,0 +1,18 @@
+nasa-blackhole.mp4 / nasa-blackhole-poster.jpg
+
+Source : NASA's Scientific Visualization Studio
+         "Black Hole Accretion Disk Visualization"
+         https://svs.gsfc.nasa.gov/13326/
+Original: BH_AccretionDisk_Sim_360_Center_16x9_1080.webm (1920x1080, VP8, 2.55 MB)
+          https://svs.gsfc.nasa.gov/vis/a010000/a013300/a013326/BH_AccretionDisk_Sim_360_Center_16x9_1080.webm
+
+Credit : NASA's Goddard Space Flight Center / Jeremy Schnittman
+         Visualizer: Jeremy Schnittman · Producer: Scott Wiessinger
+         Science writer: Francis Reddy
+
+Modifications: audio track removed; scaled 1920x1080 -> 1280x720; re-encoded
+H.264 CRF 30 with a 10-frame GOP so scroll scrubbing seeks cheaply. No frames
+were added, removed or reordered; the imagery is NASA's.
+
+NASA media is generally free to use with credit. The NASA insignia/logo is not
+used here. Credit is displayed in the running interface, not only in this file.

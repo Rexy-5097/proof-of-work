@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { registry } from "@/data/registry";
 import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
 
-const BlackHoleScene = dynamic(() => import("./BlackHoleScene"), { ssr: false });
+const NasaBlackHole = dynamic(() => import("./NasaBlackHole"), { ssr: false });
 
 const SESSION_KEY = "pow-intro";
 const SCROLL_TO_COMPLETE = 2600; // px of accumulated intent
@@ -29,7 +29,7 @@ const LINES: { at: number; text: string }[] = [
  * recruiter and the work is a liability if it misbehaves:
  *  · Once per session — a returning visitor never sees it twice.
  *  · Always skippable (button, Escape, or Enter) and never traps focus.
- *  · Reduced motion, or no WebGL: it does not mount at all.
+ *  · Reduced motion, or no H.264 playback: it does not mount at all.
  *  · It is an overlay on `/`, not a separate route, so the portfolio HTML
  *    is still what crawlers and direct links get. Nothing here is
  *    server-rendered; the page underneath is complete without it.
@@ -60,14 +60,10 @@ export function IntroGate() {
   useEffect(() => {
     if (!animate) return;
     if (sessionStorage.getItem(SESSION_KEY) === "1") return;
-    let webgl = false;
-    try {
-      const c = document.createElement("canvas");
-      webgl = !!(c.getContext("webgl2") || c.getContext("webgl"));
-    } catch {
-      webgl = false;
-    }
-    if (!webgl) return;
+    // The visual is NASA H.264 footage now, so the capability that
+    // matters is video playback, not WebGL.
+    const probe = document.createElement("video");
+    if (!probe.canPlayType("video/mp4")) return;
     sessionStorage.setItem(SESSION_KEY, "1");
     // The gate replaces the terminal boot overlay for this visit — a
     // first-time reader must never be handed two curtains in a row.
@@ -154,7 +150,7 @@ export function IntroGate() {
       className="fixed inset-0 z-[95] bg-[#03050a] transition-opacity duration-[620ms]"
       style={{ opacity: leaving ? 0 : 1 }}
     >
-      <BlackHoleScene progressRef={progressRef} />
+      <NasaBlackHole progressRef={progressRef} />
 
       {/* readout */}
       <div className="pointer-events-none absolute inset-x-0 top-0 p-[var(--page-margin)]">
@@ -201,6 +197,22 @@ export function IntroGate() {
           )}
         </div>
       </div>
+
+      {/* NASA asks that its media be credited where it is used, not only in
+          a licence file — so the credit rides in the interface itself. */}
+      <p className="absolute bottom-[var(--page-margin)] left-[var(--page-margin)] max-w-[34ch] font-mono text-micro leading-relaxed text-ink-lo">
+        Visualization:{" "}
+        <a
+          href="https://svs.gsfc.nasa.gov/13326/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline decoration-ink-lo/40 underline-offset-2 hover:text-ink-md"
+        >
+          NASA&apos;s Scientific Visualization Studio
+        </a>
+        <br />
+        NASA&apos;s Goddard Space Flight Center / Jeremy Schnittman
+      </p>
 
       <button
         type="button"
