@@ -81,6 +81,7 @@ function Beat({
   progress,
   first,
   last,
+  travel = true,
 }: {
   beat: (typeof BEATS)[number];
   progress: MotionValue<number>;
@@ -89,6 +90,9 @@ function Beat({
   first?: boolean;
   /** The closing beat never fades out — it hands over to the hero. */
   last?: boolean;
+  /** Reduced motion keeps the cross-dissolve (opacity is not a vestibular
+   *  trigger) but drops the travel. */
+  travel?: boolean;
 }) {
   const [start, end] = beat.at;
 
@@ -108,7 +112,8 @@ function Beat({
     const fadeOut = last ? 1 : clamp01((end - p) / W);
     return Math.min(fadeIn, fadeOut);
   });
-  const y = useTransform(progress, [start, end], first ? [0, -18] : [18, -18]);
+  const rise = useTransform(progress, [start, end], first ? [0, -18] : [18, -18]);
+  const y = travel ? rise : 0;
 
   return (
     <motion.div
@@ -153,8 +158,15 @@ export function SolarOverture() {
   // So it simply plays, muted and looping. The corona is always moving,
   // scroll still drives the story (the beats, the disc, the light), and
   // there is no decoder race to lose.
+  //
+  // This runs even under reduced motion, deliberately. The previous version
+  // swapped the whole section for a still poster when `animate` was false —
+  // which is what anyone with macOS "Reduce Motion" on, or who had ever hit
+  // the site's own Escape motion toggle, actually saw: a round JPEG, never
+  // the Sun. The footage is the content here, not decoration. What reduced
+  // motion switches off is the vestibular part — the disc's scale and the
+  // beats' travel below — while the cross-dissolve and the loop stay.
   useEffect(() => {
-    if (!animate) return;
     const video = videoRef.current;
     if (!video) return;
 
@@ -170,38 +182,6 @@ export function SolarOverture() {
   const scale = useTransform(scrollYProgress, [0, 1], [1.12, 0.92]);
   const cueOpacity = useTransform(scrollYProgress, [0, 0.06], [1, 0]);
 
-  // Reduced motion: no sticky stage, no scrubbing. One still frame and the
-  // same five beats as ordinary prose, which is the whole argument anyway.
-  if (!animate) {
-    return (
-      <section
-        id="overture"
-        aria-label="Prologue — the Sun, and a negative result"
-        className="border-b border-line bg-[#04060b]"
-      >
-        <div className="mx-auto grid max-w-6xl gap-10 px-[var(--page-margin)] py-20 md:grid-cols-2 md:items-center">
-          <img
-            src="/nasa-sun-poster.jpg"
-            alt="The Sun in 171 ångström extreme ultraviolet, imaged by NASA's Solar Dynamics Observatory on 1 February 2026."
-            width={720}
-            height={720}
-            className="mx-auto w-full max-w-sm rounded-full"
-          />
-          <div className="space-y-8">
-            {BEATS.map((b) => (
-              <div key={b.kicker}>
-                <p className="mono-label mb-2 tracking-[0.16em] text-seal">{b.kicker}</p>
-                <p className="font-display text-2xl leading-snug text-ink-hi">{b.line}</p>
-                {b.sub ? <p className="mt-2 text-sm text-ink-md">{b.sub}</p> : null}
-              </div>
-            ))}
-            <Credit />
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section
       ref={sectionRef}
@@ -212,7 +192,7 @@ export function SolarOverture() {
       <div className="sticky top-0 h-svh overflow-hidden">
         {/* The star itself. */}
         <motion.div
-          style={{ scale }}
+          style={{ scale: animate ? scale : 1 }}
           className="absolute inset-0 flex items-center justify-center will-change-transform"
         >
           <div className="relative aspect-square h-[min(78svh,78vw)]">
@@ -257,6 +237,7 @@ export function SolarOverture() {
                 progress={scrollYProgress}
                 first={i === 0}
                 last={i === BEATS.length - 1}
+                travel={animate}
               />
             ))}
           </div>
