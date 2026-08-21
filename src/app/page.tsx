@@ -1,4 +1,5 @@
 import { Container, Section } from "@/components/layout/Section";
+import { SolarOverture } from "@/components/landing/SolarOverture";
 import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { Spotlight } from "@/components/effects/Spotlight";
 import { TextGenerate } from "@/components/effects/TextGenerate";
@@ -77,6 +78,11 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
       />
+      {/* Prologue. Sits above the numbered audit rather than inside it:
+          the rail still starts at 00 / THE CLAIM, and every existing
+          anchor keeps pointing where it always did. */}
+      <SolarOverture />
+
       {/* overflow-hidden: the Spotlight is deliberately larger than the
           viewport and offset, so its container must clip it (as Aceternity's
           own demo does) or it widens the document by a few pixels. */}

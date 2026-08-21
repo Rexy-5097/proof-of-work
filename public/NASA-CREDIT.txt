@@ -1,0 +1,27 @@
+nasa-sun.mp4 / nasa-sun-poster.jpg
+
+Source  : NASA's Scientific Visualization Studio
+          "Four Days of Solar Dynamics in 16 Minutes" (SVS ID 5649,
+          released 10 June 2026)
+          https://svs.gsfc.nasa.gov/5649/
+
+Original: NOVA20260201_AIA.0171A_PSF_stamped_1024p30.mp4
+          (1024x1024, H.264, 301 MB)
+          https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005649/NOVA20260201_AIA.0171A_PSF_stamped_1024p30.mp4
+
+Imagery : NASA Solar Dynamics Observatory (SDO), Atmospheric Imaging
+          Assembly, 171 angstrom extreme ultraviolet. The burned-in
+          timestamps are NASA's own and are left intact.
+
+Credit  : NASA's Goddard Space Flight Center
+          Visualization: AJ Christensen
+
+Modifications: an 18-second excerpt (from 00:40) was taken from the
+16-minute original; no audio track was present; scaled 1024x1024 ->
+720x720 and re-encoded H.264 CRF 30 with a 10-frame GOP so that
+scroll scrubbing can seek cheaply. No frames were added, removed or
+reordered, and nothing was recoloured; the imagery is NASA's.
+
+NASA media is generally free to use with credit. The NASA insignia/logo
+is not used here. Credit is displayed in the running interface, not only
+in this file.
