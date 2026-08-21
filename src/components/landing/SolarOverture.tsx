@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import {
   motion,
-  useMotionValueEvent,
   useScroll,
   useTransform,
   type MotionValue,
@@ -11,15 +10,19 @@ import {
 import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
 
 /**
- * The prologue: NASA's Sun, scrubbed by the reader's own scroll.
+ * The prologue: NASA's Sun, with the reader's scroll driving the story
+ * told over it.
  *
  * This is deliberately NOT the wheel-capturing overlay it replaces. That
  * one preventDefault()ed every wheel event to drive its own progress
  * counter, which meant it was fighting Lenis for the scroll position and
  * made the whole page feel heavy. Here the page scrolls normally: a tall
  * section holds a sticky stage, and the section's own scroll progress
- * drives the video's currentTime. Nothing is hijacked, so there is no
+ * drives the beats and the disc. Nothing is hijacked, so there is no
  * scroll to lose a fight over — and the reader can flick past it.
+ *
+ * The footage plays on its own clock rather than being scrubbed; see the
+ * effect below for why scrubbing showed a still image instead of a star.
  *
  * The five beats are the argument the rest of the site makes, in
  * miniature: this is a real measurement, of a real star, and the honest
@@ -70,9 +73,8 @@ const BEATS: {
  *  them separate intervals and the handoff dips to 0.25/0.25, which reads
  *  as a flicker rather than a dissolve. */
 const W = 0.035;
-/** How long the opening beat holds full opacity before it can be
- *  interpolated. Must be a real interval, not an epsilon (see below). */
-const HOLD = 0.01;
+
+const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 
 function Beat({
   beat,
@@ -89,26 +91,23 @@ function Beat({
   last?: boolean;
 }) {
   const [start, end] = beat.at;
-  // Every beat uses the same four-stop shape, and the stops must be four,
-  // distinct, and inside [0, 1]. Both shortcuts here are traps: a repeated
-  // stop or a three-stop list loses useTransform's clamping (the beat fades
-  // back in as the reader scrolls past it, over the top of later beats),
-  // and a negative stop reaches WAAPI as a negative keyframe offset, which
-  // throws and unmounts the section. The opening beat — which must already
-  // be readable at progress 0 — therefore holds opacity 1 over a small but
-  // real interval. It has to be real: an epsilon like 1e-4 rounds back into
-  // a duplicate stop and the value sticks at 1 forever, so the beat never
-  // leaves the screen. 1% of the section is ~30px, i.e. invisible.
-  const opacity = useTransform(
-    progress,
-    [
-      first ? start : start - W,
-      first ? start + HOLD : start,
-      last ? end - HOLD : end - W,
-      end,
-    ],
-    [first ? 1 : 0, 1, 1, last ? 1 : 0],
-  );
+
+  // Computed, not interpolated between stops. Every stop-list form of this
+  // failed in a different way — a repeated stop, a three-stop list and a
+  // 1e-4 epsilon each lose clamping, so the opening beat faded back IN on
+  // top of the later beats, and a negative stop reaches WAAPI as a negative
+  // keyframe offset and throws. A plain function has no stop-list semantics
+  // to get wrong: it is explicitly clamped and cannot rise again once past.
+  //
+  // Outgoing and incoming beats share one interval — beat i fades out over
+  // [end - W, end] and beat i+1 fades in over exactly the same span — so
+  // the pair always sums to 1 and the handoff reads as a dissolve rather
+  // than a dip through darkness.
+  const opacity = useTransform(progress, (p) => {
+    const fadeIn = first ? 1 : clamp01((p - (start - W)) / W);
+    const fadeOut = last ? 1 : clamp01((end - p) / W);
+    return Math.min(fadeIn, fadeOut);
+  });
   const y = useTransform(progress, [start, end], first ? [0, -18] : [18, -18]);
 
   return (
@@ -134,48 +133,41 @@ export function SolarOverture() {
   const { animate } = useMotionPrefs();
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const targetRef = useRef(0);
-  const rafRef = useRef(0);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  useMotionValueEvent(scrollYProgress, "change", (p) => {
-    targetRef.current = p;
-  });
-
-  // Scrubbing is done off the scroll event, in a rAF loop, because seeking
-  // is asynchronous: setting currentTime on every scroll tick queues seeks
-  // faster than the decoder retires them and the picture falls behind. One
-  // seek per frame, and only when the delta is worth a decode.
+  // The Sun runs on its own clock.
+  //
+  // This used to scrub: paused, with scroll driving currentTime. Two things
+  // made that show a still image instead of a star. A paused <video> keeps
+  // painting its `poster` until a frame has actually been decoded, so before
+  // the first seek lands there is nothing but the JPEG; and seeking is
+  // asynchronous, so a slow reader — or a fast one on a slow decoder —
+  // spends most of the section watching one frame while seeks queue behind
+  // it. Scroll-driven video looks broken exactly when the reader is gentle
+  // with it, which is the wrong failure mode for the first thing on the page.
+  //
+  // So it simply plays, muted and looping. The corona is always moving,
+  // scroll still drives the story (the beats, the disc, the light), and
+  // there is no decoder race to lose.
   useEffect(() => {
     if (!animate) return;
     const video = videoRef.current;
     if (!video) return;
 
-    video.pause();
-    let last = -1;
-
-    const tick = () => {
-      rafRef.current = requestAnimationFrame(tick);
-      const duration = video.duration;
-      if (!Number.isFinite(duration) || duration === 0) return;
-      if (video.seeking) return;
-      const next = Math.min(targetRef.current, 0.999) * duration;
-      if (Math.abs(next - last) < 1 / 30) return;
-      last = next;
-      video.currentTime = next;
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
+    // play() rejects if autoplay is refused; the poster is then the honest
+    // fallback and the beats still carry the argument, so this is not fatal.
+    const start = () => void video.play().catch(() => {});
+    if (video.readyState >= 2) start();
+    video.addEventListener("loadeddata", start);
+    return () => video.removeEventListener("loadeddata", start);
   }, [animate]);
 
   // The disc grows and settles as the reader scrolls the argument.
   const scale = useTransform(scrollYProgress, [0, 1], [1.12, 0.92]);
-  const glow = useTransform(scrollYProgress, [0, 0.5, 1], [0.35, 0.6, 0.3]);
   const cueOpacity = useTransform(scrollYProgress, [0, 0.06], [1, 0]);
 
   // Reduced motion: no sticky stage, no scrubbing. One still frame and the
@@ -224,11 +216,6 @@ export function SolarOverture() {
           className="absolute inset-0 flex items-center justify-center will-change-transform"
         >
           <div className="relative aspect-square h-[min(78svh,78vw)]">
-            <motion.div
-              aria-hidden="true"
-              style={{ opacity: glow }}
-              className="absolute -inset-[12%] rounded-full bg-[radial-gradient(circle,#ffb347_0%,#c2410c_45%,transparent_70%)] blur-2xl"
-            />
             {/* object-contain keeps NASA's full square frame — including
                 their burned-in timestamp — rather than cropping it. The
                 source's background is pure black, so `screen` drops it
@@ -239,6 +226,8 @@ export function SolarOverture() {
               src="/nasa-sun.mp4"
               poster="/nasa-sun-poster.jpg"
               muted
+              loop
+              autoPlay
               playsInline
               preload="auto"
               // Decorative here: the same facts are in the beats as text.
