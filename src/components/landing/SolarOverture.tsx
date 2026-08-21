@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import {
   motion,
   useScroll,
@@ -21,8 +21,9 @@ import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
  * drives the beats and the disc. Nothing is hijacked, so there is no
  * scroll to lose a fight over — and the reader can flick past it.
  *
- * The footage plays on its own clock rather than being scrubbed; see the
- * effect below for why scrubbing showed a still image instead of a star.
+ * The star itself is a sprite sheet stepped by scroll position rather
+ * than a <video>; see the comment below for why both video approaches
+ * showed a still image instead of a star.
  *
  * The five beats are the argument the rest of the site makes, in
  * miniature: this is a real measurement, of a real star, and the honest
@@ -75,6 +76,13 @@ const BEATS: {
 const W = 0.035;
 
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
+
+/** Frames of NASA footage laid out on one sheet, and its grid. Keep these
+ *  in step with public/nasa-sun-sprite.jpg and the bg-[length:800%_500%]
+ *  below — 8 columns, 5 rows, 40 frames. */
+const SPRITE_COLS = 8;
+const SPRITE_ROWS = 5;
+const FRAMES = SPRITE_COLS * SPRITE_ROWS;
 
 function Beat({
   beat,
@@ -137,46 +145,34 @@ function Beat({
 export function SolarOverture() {
   const { animate } = useMotionPrefs();
   const sectionRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // The Sun runs on its own clock.
+  // The Sun is a sprite sheet, stepped by scroll position.
   //
-  // This used to scrub: paused, with scroll driving currentTime. Two things
-  // made that show a still image instead of a star. A paused <video> keeps
-  // painting its `poster` until a frame has actually been decoded, so before
-  // the first seek lands there is nothing but the JPEG; and seeking is
-  // asynchronous, so a slow reader — or a fast one on a slow decoder —
-  // spends most of the section watching one frame while seeks queue behind
-  // it. Scroll-driven video looks broken exactly when the reader is gentle
-  // with it, which is the wrong failure mode for the first thing on the page.
+  // It was a <video> twice over, and both ways failed. Scrubbed, a paused
+  // <video> keeps painting its `poster` until a frame is actually decoded,
+  // and seeking is asynchronous — a gentle scroll spends most of the
+  // section on one frame while seeks queue behind it. Auto-playing, it
+  // depends on autoplay policy and on the decoder: block or throttle either
+  // one and the reader gets a still JPEG with no way to tell it is broken.
   //
-  // So it simply plays, muted and looping. The corona is always moving,
-  // scroll still drives the story (the beats, the disc, the light), and
-  // there is no decoder race to lose.
-  //
-  // This runs even under reduced motion, deliberately. The previous version
-  // swapped the whole section for a still poster when `animate` was false —
-  // which is what anyone with macOS "Reduce Motion" on, or who had ever hit
-  // the site's own Escape motion toggle, actually saw: a round JPEG, never
-  // the Sun. The footage is the content here, not decoration. What reduced
-  // motion switches off is the vestibular part — the disc's scale and the
-  // beats' travel below — while the cross-dissolve and the loop stay.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    // play() rejects if autoplay is refused; the poster is then the honest
-    // fallback and the beats still carry the argument, so this is not fatal.
-    const start = () => void video.play().catch(() => {});
-    if (video.readyState >= 2) start();
-    video.addEventListener("loadeddata", start);
-    return () => video.removeEventListener("loadeddata", start);
-  }, [animate]);
+  // A sprite has neither failure mode. It is one image; stepping it is a
+  // background-position change, so the frame shown is a pure function of
+  // scroll position and it cannot silently freeze. It is also what the
+  // reader asked for: the star advances because they scrolled, not because
+  // a clock somewhere is running.
+  const framePosition = useTransform(scrollYProgress, (p) => {
+    const i = Math.round(clamp01(p) * (FRAMES - 1));
+    const col = i % SPRITE_COLS;
+    const row = Math.floor(i / SPRITE_COLS);
+    // With background-size 800% 500%, a step is 100/(n-1) percent: at 100%
+    // the far edge of the sheet aligns with the far edge of the box.
+    return `${(col / (SPRITE_COLS - 1)) * 100}% ${(row / (SPRITE_ROWS - 1)) * 100}%`;
+  });
 
   // The disc grows and settles as the reader scrolls the argument.
   const scale = useTransform(scrollYProgress, [0, 1], [1.12, 0.92]);
@@ -196,23 +192,14 @@ export function SolarOverture() {
           className="absolute inset-0 flex items-center justify-center will-change-transform"
         >
           <div className="relative aspect-square h-[min(78svh,78vw)]">
-            {/* object-contain keeps NASA's full square frame — including
-                their burned-in timestamp — rather than cropping it. The
-                source's background is pure black, so `screen` drops it
-                into the page instead of leaving a hard square edge. */}
-            <video
-              ref={videoRef}
-              className="relative h-full w-full object-contain mix-blend-screen"
-              src="/nasa-sun.mp4"
-              poster="/nasa-sun-poster.jpg"
-              muted
-              loop
-              autoPlay
-              playsInline
-              preload="auto"
-              // Decorative here: the same facts are in the beats as text.
+            {/* One frame of NASA's square sheet. The source background is
+                pure black, so `screen` drops it into the page instead of
+                leaving a hard square edge, and the burned-in timestamps
+                stay legible. */}
+            <motion.div
+              style={{ backgroundPosition: framePosition }}
+              className="relative h-full w-full bg-[url('/nasa-sun-sprite.jpg')] bg-[length:800%_500%] bg-no-repeat mix-blend-screen"
               aria-hidden="true"
-              tabIndex={-1}
             />
           </div>
         </motion.div>
