@@ -187,6 +187,13 @@ html.pow-rippling::view-transition-new(root) {
     scroll-behavior: smooth;
   }
 
+  /* Lenis drives scrolling once it mounts. Leaving native smooth behaviour
+     on means the browser and Lenis both animate the same scrollTop every
+     frame, which reads as lag rather than smoothness. */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;

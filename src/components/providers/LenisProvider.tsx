@@ -15,9 +15,13 @@ type ScrollToTarget = string | HTMLElement;
 interface LenisApi {
   /** Smooth-scroll to an anchor; falls back to native when Lenis is off. */
   scrollTo: (target: ScrollToTarget) => void;
+  /** The live instance, so scroll-linked libraries can sync to it.
+   *  Null when reduced motion has disabled smooth scrolling. */
+  getLenis: () => Lenis | null;
 }
 
 const LenisContext = createContext<LenisApi>({
+  getLenis: () => null,
   scrollTo: (target) => {
     const el =
       typeof target === "string" ? document.querySelector(target) : target;
@@ -57,6 +61,7 @@ export function LenisProvider({ children }: { children: ReactNode }) {
   }, [animate]);
 
   const api: LenisApi = {
+    getLenis: () => lenisRef.current,
     scrollTo: (target) => {
       const lenis = lenisRef.current;
       if (lenis) {

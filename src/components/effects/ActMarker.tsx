@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/cn";
 import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
+import { useLenis } from "@/components/providers/LenisProvider";
 
 /**
  * A cinematic act transition — the beat between movements of the audit.
@@ -21,6 +22,9 @@ import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
  * Under reduced motion the whole thing degrades to a static, fully
  * legible title card: no sticky runway, no scrub, no letter animation.
  */
+/** Wired once per page load, however many act markers mount. */
+let scrollTriggerBridged = false;
+
 export function ActMarker({
   act,
   title,
@@ -37,6 +41,7 @@ export function ActMarker({
   const ruleRef = useRef<HTMLSpanElement>(null);
   const titleRef = useRef<HTMLParagraphElement>(null);
   const { animate: motionOn } = useMotionPrefs();
+  const { getLenis } = useLenis();
 
   useEffect(() => {
     if (!motionOn) return;
@@ -57,6 +62,18 @@ export function ActMarker({
       { animate, stagger },
     ]) => {
       if (cancelled) return;
+
+      /* Sync ScrollTrigger to Lenis. Lenis writes scrollTop every frame;
+         without this bridge ScrollTrigger keeps reading native scroll
+         events and every scrub trails the page, which reads as lag.
+         Wired here rather than in LenisProvider so GSAP stays off pages
+         that use no triggers, and guarded so N markers wire it once. */
+      const lenis = getLenis();
+      if (lenis && !scrollTriggerBridged) {
+        scrollTriggerBridged = true;
+        lenis.on("scroll", ScrollTrigger.update);
+        ScrollTrigger.refresh();
+      }
       ctx = gsap.context(() => {
         gsap.fromTo(
           rule,
@@ -109,7 +126,7 @@ export function ActMarker({
       cancelled = true;
       ctx?.revert();
     };
-  }, [motionOn]);
+  }, [motionOn, getLenis]);
 
   const chars = [...title];
 

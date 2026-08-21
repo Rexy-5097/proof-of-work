@@ -9,10 +9,10 @@ import { SiteNav } from "@/components/layout/SiteNav";
 import { AuditRail } from "@/components/layout/AuditRail";
 import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import { BootSequence } from "@/components/boot/BootSequence";
-import { IntroGate } from "@/components/intro/IntroGate";
 import { Footer } from "@/components/layout/Footer";
 import { ConsoleGreeting } from "@/components/chrome/ConsoleGreeting";
 import { site } from "@/data/site";
+import "lenis/dist/lenis.css";
 import "./globals.css";
 
 const inter = Inter({
@@ -95,7 +95,6 @@ export default function RootLayout({
             <SoundProvider>
               <LenisProvider>
                 <AuditProgressProvider>
-                  <IntroGate />
                   <BootSequence />
                   <ScrollProgress />
                   <SiteNav />

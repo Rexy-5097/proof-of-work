@@ -15,6 +15,16 @@ export function useInViewOnce<T extends Element>(
   useEffect(() => {
     const el = ref.current;
     if (!el || inView) return;
+
+    // A ratio threshold is unreachable once the element is taller than
+    // `viewportHeight / threshold` — the observer would then never fire and
+    // the content would stay at opacity 0 forever. Sections here grow with
+    // the data (the ledger table gains a row per repo), so clamp the ratio
+    // to what this element can actually reach and let a sliver count.
+    const height = el.getBoundingClientRect().height;
+    const reachable = height > 0 ? window.innerHeight / height : 1;
+    const effective = Math.min(threshold, reachable * 0.5);
+
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
@@ -22,7 +32,7 @@ export function useInViewOnce<T extends Element>(
           io.disconnect();
         }
       },
-      { threshold },
+      { threshold: effective },
     );
     io.observe(el);
     return () => io.disconnect();
