@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   motion,
   useScroll,
@@ -21,9 +21,8 @@ import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
  * drives the beats and the disc. Nothing is hijacked, so there is no
  * scroll to lose a fight over — and the reader can flick past it.
  *
- * The star itself is a sprite sheet stepped by scroll position rather
- * than a <video>; see the comment below for why both video approaches
- * showed a still image instead of a star.
+ * The star is full-bleed and its footage is scrubbed by scroll position,
+ * so coronal loops and flares cross the screen as the reader descends.
  *
  * The five beats are the argument the rest of the site makes, in
  * miniature: this is a real measurement, of a real star, and the honest
@@ -76,13 +75,6 @@ const BEATS: {
 const W = 0.035;
 
 const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
-
-/** Frames of NASA footage laid out on one sheet, and its grid. Keep these
- *  in step with public/nasa-sun-sprite.jpg and the bg-[length:800%_500%]
- *  below — 8 columns, 5 rows, 40 frames. */
-const SPRITE_COLS = 8;
-const SPRITE_ROWS = 5;
-const FRAMES = SPRITE_COLS * SPRITE_ROWS;
 
 function Beat({
   beat,
@@ -145,37 +137,85 @@ function Beat({
 export function SolarOverture() {
   const { animate } = useMotionPrefs();
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // The Sun is a sprite sheet, stepped by scroll position.
+  // Scroll drives the footage: the star advances because the reader moved,
+  // not because a clock is running. This is the same thing adityanet does
+  // with its own hero — a paused <video> whose currentTime is a function of
+  // scroll — and it is why the flares arrive on the way down.
   //
-  // It was a <video> twice over, and both ways failed. Scrubbed, a paused
-  // <video> keeps painting its `poster` until a frame is actually decoded,
-  // and seeking is asynchronous — a gentle scroll spends most of the
-  // section on one frame while seeks queue behind it. Auto-playing, it
-  // depends on autoplay policy and on the decoder: block or throttle either
-  // one and the reader gets a still JPEG with no way to tell it is broken.
+  // Two details keep it from degrading into a still image, which is how
+  // every earlier attempt here failed. The poster is painted by the wrapper
+  // behind, so a slow decode never shows blank; and the first frame is
+  // forced out with a play/pause pair, because a <video> that has never
+  // played keeps showing its poster until a frame is actually decoded — so
+  // without this the picture only "starts" once the reader scrolls far
+  // enough to trigger a seek that lands.
   //
-  // A sprite has neither failure mode. It is one image; stepping it is a
-  // background-position change, so the frame shown is a pure function of
-  // scroll position and it cannot silently freeze. It is also what the
-  // reader asked for: the star advances because they scrolled, not because
-  // a clock somewhere is running.
-  const framePosition = useTransform(scrollYProgress, (p) => {
-    const i = Math.round(clamp01(p) * (FRAMES - 1));
-    const col = i % SPRITE_COLS;
-    const row = Math.floor(i / SPRITE_COLS);
-    // With background-size 800% 500%, a step is 100/(n-1) percent: at 100%
-    // the far edge of the sheet aligns with the far edge of the box.
-    return `${(col / (SPRITE_COLS - 1)) * 100}% ${(row / (SPRITE_ROWS - 1)) * 100}%`;
-  });
+  // Driven by the scroll event, and deliberately NOT by requestAnimationFrame.
+  // An rAF loop stops the moment the browser throttles frames — a background
+  // tab, a hidden window, Low Power Mode — and a scrub loop that stops is
+  // indistinguishable from a broken one: the star simply freezes and there is
+  // nothing on screen to say why. That is the failure that kept showing a
+  // still image here. Scroll events keep firing when rAF does not, which is
+  // also how adityanet's hero survives the same conditions.
+  //
+  // Progress is measured off the section's own box rather than read from a
+  // motion value, because motion values are themselves updated on rAF and
+  // would reintroduce exactly the dependency this is avoiding.
+  //
+  // Seeks are skipped while one is already in flight, and while the target
+  // has not moved a frame's worth: queuing a seek per scroll event leaves the
+  // decoder permanently behind the scroll position.
+  useEffect(() => {
+    const video = videoRef.current;
+    const section = sectionRef.current;
+    if (!video || !section) return;
 
-  // The disc grows and settles as the reader scrolls the argument.
-  const scale = useTransform(scrollYProgress, [0, 1], [1.12, 0.92]);
+    let last = -1;
+
+    const prime = () => {
+      void video.play().then(() => video.pause()).catch(() => {});
+    };
+    if (video.readyState >= 2) prime();
+    else video.addEventListener("loadeddata", prime, { once: true });
+
+    const update = () => {
+      const duration = video.duration;
+      if (!Number.isFinite(duration) || duration === 0) return;
+      if (video.seeking) return;
+      const span = section.offsetHeight - window.innerHeight;
+      if (span <= 0) return;
+      const p = clamp01(-section.getBoundingClientRect().top / span);
+      const next = p * (duration - 0.05);
+      if (Math.abs(next - last) < 1 / 30) return;
+      last = next;
+      video.currentTime = next;
+    };
+
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    video.addEventListener("loadedmetadata", update);
+    update();
+
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      video.removeEventListener("loadedmetadata", update);
+      video.removeEventListener("loadeddata", prime);
+    };
+  }, []);
+
+  // A slow push in. This must never drop below 1: the plate is sized to the
+  // viewport, so any value under 1 shrinks it inside its own frame and lets
+  // the page background show around the edges of a supposedly full-bleed
+  // star.
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
   const cueOpacity = useTransform(scrollYProgress, [0, 0.06], [1, 0]);
 
   return (
@@ -186,28 +226,44 @@ export function SolarOverture() {
       className="relative h-[420svh] bg-[#04060b]"
     >
       <div className="sticky top-0 h-svh overflow-hidden">
-        {/* The star itself. */}
+        {/* The star itself, full-bleed.
+            `cover` is the whole point: the disc is cropped well past the
+            viewport so the reader is down among the coronal loops, where a
+            flare is a third of the screen. Fitted inside a tidy circle
+            instead, the same footage reads as a small logo that barely
+            changes — which is exactly what it looked like before.
+            The poster sits on the wrapper as a background so there is never
+            a blank frame while the video decodes or seeks. */}
         <motion.div
           style={{ scale: animate ? scale : 1 }}
-          className="absolute inset-0 flex items-center justify-center will-change-transform"
+          className="absolute inset-0 bg-[url('/nasa-sun-poster.jpg')] bg-cover bg-center will-change-transform"
         >
-          <div className="relative aspect-square h-[min(78svh,78vw)]">
-            {/* One frame of NASA's square sheet. The source background is
-                pure black, so `screen` drops it into the page instead of
-                leaving a hard square edge, and the burned-in timestamps
-                stay legible. */}
-            <motion.div
-              style={{ backgroundPosition: framePosition }}
-              className="relative h-full w-full bg-[url('/nasa-sun-sprite.jpg')] bg-[length:800%_500%] bg-no-repeat mix-blend-screen"
-              aria-hidden="true"
-            />
-          </div>
+          <video
+            ref={videoRef}
+            className="h-full w-full object-cover"
+            src="/nasa-sun.mp4"
+            muted
+            playsInline
+            preload="auto"
+            // Decorative: the same facts are in the beats as text.
+            aria-hidden="true"
+            tabIndex={-1}
+          />
         </motion.div>
 
-        {/* Vignette, so the type stays legible over the corona. */}
+        {/* Vignette, so the type stays legible over the corona. Full-bleed
+            changed what this has to do: the old centred disc left dark page
+            around the edges to set type on, but the corona now fills the
+            frame and the bottom-left copy sits directly on the brightest
+            part of the star. Hence the second, harder scrim under the
+            beats — the radial alone leaves them at roughly 2:1. */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,#04060bE6_78%)]"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#04060bCC_85%)]"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-[#04060b] via-[#04060b]/85 to-transparent"
         />
 
         {/* The argument, one beat at a time. */}
