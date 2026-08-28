@@ -381,3 +381,77 @@ html.pow-rippling::view-transition-new(root) {
 @utility tabular {
   font-variant-numeric: tabular-nums;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   The chapter scrim.
+
+   The world behind the audit is a lit night scene, not the flat field the
+   constellation was, so the copy needs something between it and the temple.
+   This is Kage's own grammar, ported with it: a radial wash owned by each
+   chapter rather than one flat sheet over the whole canvas, so the frame
+   stays legible where the reading is and stays open at the edges where the
+   scene is the point.
+
+   Two details carried over from the source, both load-bearing:
+
+   · The scrim is inset well past the section box. Its edges would otherwise
+     land as a visible seam at every chapter boundary.
+   · That overshoot, plus the section's own top padding, means an unmasked
+     scrim washes most of a screen of temple *above* the copy — the frame
+     stays veiled long after the previous chapter has let go of it. The mask
+     takes that back off: nothing at the very top, full strength by the time
+     the chapter's first line arrives.
+
+   `isolate` on the section is what keeps the negative z-index local. The
+   section is positioned but has no z-index of its own, so without it the
+   scrim resolves against <main> and paints *behind* the canvas. */
+[data-audit-section] {
+  isolation: isolate;
+}
+
+[data-audit-section]::before {
+  content: "";
+  position: absolute;
+  inset: -20% -6%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    100% 58% at 50% 50%,
+    rgb(4 7 11 / 0.58),
+    rgb(4 7 11 / 0.36) 48%,
+    rgb(4 7 11 / 0.08) 78%,
+    rgb(4 7 11 / 0)
+  );
+  /* Not fully transparent at the top as the source has it: this site's
+     chapters abut, and its section label sits high enough that an unmasked
+     first fifth left it sitting on bare temple. A sixth of scrim at the
+     seam is enough for the label and still lets the frame breathe between
+     one chapter and the next. */
+  -webkit-mask-image: linear-gradient(rgb(0 0 0 / 0.16), #000 34%);
+  mask-image: linear-gradient(rgb(0 0 0 / 0.16), #000 34%);
+}
+
+/* The paper theme is a lit room, and the world is faded out there anyway —
+   a black wash over white paper would read as a rendering fault. */
+html[data-theme="paper"] [data-audit-section]::before {
+  display: none;
+}
+
+/* The scrim above is deliberately light, because a wash heavy enough to
+   carry this site's copy density would hide the world completely — and a
+   world nobody can see is not worth the milliseconds it costs.
+
+   So the glyphs carry their own darkness instead, which is what Kage does:
+   its body, label and display classes each ship a text-shadow rather than
+   relying on the section wash. A shadow only shows where the type is, so
+   the frame between the lines stays open and the temple reads through it.
+
+   Scoped away from the paper theme (a lit room, no world behind it) and
+   from anything sitting on its own opaque panel, where the shadow would be
+   invisible anyway and only cost another paint. */
+html:not([data-theme="paper"]) [data-audit-section]
+  :where(h1, h2, h3, h4, p, li, dt, dd, blockquote, figcaption, .mono-label) {
+  text-shadow:
+    0 1px 20px rgb(3 6 8 / 0.92),
+    0 0 4px rgb(3 6 8 / 0.60);
+}

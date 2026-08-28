@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   return [
     { url: site.url, lastModified: now, changeFrequency: "monthly", priority: 1 },
+    { url: `${site.url}/proof`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: `${site.url}/engineering`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     ...journal.map((entry) => ({
       url: `${site.url}/engineering/${entry.slug}`,

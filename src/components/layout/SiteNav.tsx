@@ -9,11 +9,15 @@ import { useSound } from "@/components/providers/SoundProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { useLenis } from "@/components/providers/LenisProvider";
 
+/* The audit moved off "/" and onto its own route when the solar prologue
+   became a gate, so every chapter anchor is now /proof#… — a real
+   cross-route link from anywhere else on the site, and a same-page scroll
+   once the reader is already inside the audit. */
 const links = [
-  { label: "Projects", href: "/#evidence" },
+  { label: "Projects", href: "/proof#evidence" },
   { label: "Journal", href: "/engineering" },
-  { label: "About", href: "/#about" },
-  { label: "Contact", href: "/#contact" },
+  { label: "About", href: "/proof#about" },
+  { label: "Contact", href: "/proof#contact" },
 ] as const;
 
 export function SiteNav() {
@@ -32,9 +36,9 @@ export function SiteNav() {
   }, []);
 
   const handleAnchor = (href: string) => (e: React.MouseEvent) => {
-    if (pathname === "/" && href.startsWith("/#")) {
+    if (pathname === "/proof" && href.startsWith("/proof#")) {
       e.preventDefault();
-      scrollTo(href.slice(1));
+      scrollTo(href.slice("/proof".length));
       setMenuOpen(false);
     } else {
       setMenuOpen(false);
@@ -68,7 +72,7 @@ export function SiteNav() {
       >
         <Link
           href="/"
-          onClick={handleAnchor("/#landing")}
+          onClick={handleAnchor("/proof#landing")}
           className="flex items-center gap-2 font-mono text-label font-medium tracking-[0.08em] text-ink-hi"
         >
           <Seal state="verified" size={11} />

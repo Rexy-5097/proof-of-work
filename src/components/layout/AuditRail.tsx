@@ -21,8 +21,8 @@ export function AuditRail() {
   const done = visited.size;
   const total = auditSections.length;
 
-  // The audit runs on the home page only; other routes get ScrollProgress.
-  if (pathname !== "/") return null;
+  // The audit is its own route now; every other page gets ScrollProgress.
+  if (pathname !== "/proof") return null;
 
   return (
     <nav

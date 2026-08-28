@@ -217,15 +217,33 @@ export function SolarOverture() {
   // star.
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
   const cueOpacity = useTransform(scrollYProgress, [0, 0.06], [1, 0]);
+  // The gate. The prologue is a place the reader passes through, not a
+  // banner they scroll past, so the last stretch dissolves the whole stage —
+  // colour included, which is why the opaque background sits here and not on
+  // the section — and the world behind it comes up as the audit begins.
+  const stageOpacity = useTransform(scrollYProgress, [0.9, 1], [1, 0]);
 
   return (
     <section
       ref={sectionRef}
       id="overture"
       aria-label="Prologue — the Sun, and a negative result"
-      className="relative h-[420svh] bg-[#04060b]"
+      className="relative h-[420svh]"
     >
-      <div className="sticky top-0 h-svh overflow-hidden">
+      {/* The poster is a CSS background on a full-viewport element, which
+          makes it an LCP candidate that the preload scanner cannot see: it is
+          only discovered once the stylesheet has parsed. Declaring it here
+          pulls the request forward to the start of the load. */}
+      <link
+        rel="preload"
+        as="image"
+        href="/nasa-sun-poster.jpg"
+        fetchPriority="high"
+      />
+      <motion.div
+        style={{ opacity: stageOpacity }}
+        className="sticky top-0 h-svh overflow-hidden bg-[#04060b]"
+      >
         {/* The star itself, full-bleed.
             `cover` is the whole point: the disc is cropped well past the
             viewport so the reader is down among the coronal loops, where a
@@ -244,7 +262,11 @@ export function SolarOverture() {
             src="/nasa-sun.mp4"
             muted
             playsInline
-            preload="auto"
+            // metadata, not auto: `auto` pulled 2.7 MB of a 7.7 MB file during
+            // first load and pushed mobile LCP to 4.7s. Seeking range-requests
+            // what it needs, and the poster on the wrapper covers the gap, so
+            // the section is never blank while the buffer fills.
+            preload="metadata"
             // Decorative: the same facts are in the beats as text.
             aria-hidden="true"
             tabIndex={-1}
@@ -267,7 +289,11 @@ export function SolarOverture() {
         />
 
         {/* The argument, one beat at a time. */}
-        <div className="absolute inset-0 p-[var(--page-margin)]">
+        {/* Cleared past the fixed nav (h-14). The prologue is the first thing
+            on the site now that it has a route of its own, so its own
+            identity line is the one piece of copy guaranteed to sit directly
+            under the header rather than scrolling in from below it. */}
+        <div className="absolute inset-0 p-[var(--page-margin)] pt-[calc(var(--page-margin)+3.5rem)]">
           <p className="mono-label tracking-[0.16em] text-ink-md">
             PROOF OF WORK — SOUMYADEB TRIPATHY
           </p>
@@ -308,13 +334,13 @@ export function SolarOverture() {
         <div className="absolute right-[var(--page-margin)] bottom-[var(--page-margin)] flex items-center gap-4">
           <Credit />
           <a
-            href="#landing"
+            href="/proof"
             className="rounded-r1 border border-line px-3 py-2 font-mono text-label whitespace-nowrap text-ink-lo transition-colors duration-[var(--dur-tick)] hover:border-line-strong hover:text-ink-md"
           >
             SKIP ↓
           </a>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
