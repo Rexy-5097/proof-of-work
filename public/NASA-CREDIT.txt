@@ -19,10 +19,15 @@ Credit  : NASA's Goddard Space Flight Center
 Modifications: the full 16-minute original (1 - 4 February 2026) was
 sampled every 24th frame and retimed to a 40-second scrub track, so the
 whole four-day span - including the five X-class flares - is reachable
-by scrolling. Scaled 1024x1024 -> 900x900 and re-encoded H.264 CRF 28
-with a 10-frame GOP so seeking lands cheaply. No frames were reordered
-and nothing was recoloured; the imagery is NASA's, and their burned-in
-timestamps are left intact.
+by scrolling. Scaled 1024x1024 -> 768x768, resampled to 15 fps and
+re-encoded H.264 CRF 28 with a 1-second GOP. The delivered file is
+3.6 MB against the original 301 MB; measured SSIM against the 900x900
+30 fps version this replaces is 0.957, and at the size it is displayed
+the two are indistinguishable. The smaller file is what makes the scrub
+smooth on a slow connection - at 7.4 MB the star stepped in visible
+jumps because the decoder was waiting on the network. No frames were
+reordered and nothing was recoloured; the imagery is NASA's, and their
+burned-in timestamps are left intact.
 
 NASA media is generally free to use with credit. The NASA insignia/logo
 is not used here. Credit is displayed in the running interface, not only

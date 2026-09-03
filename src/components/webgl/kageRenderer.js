@@ -110,18 +110,33 @@ function normalFromHeight(hc, strength) {
   const src = bx.getImageData(0, 0, W, H).data;
   const out = cvs(W, H), ox = out.getContext('2d');
   const im = ox.createImageData(W, H), d = im.data;
-  const at = (x, y) => src[(((y + H) % H) * W + ((x + W) % W)) * 4] / 255;
-  const s = strength || 2.4;
-  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-    const gx = (at(x + 1, y) - at(x - 1, y)) * s;
-    const gy = (at(x, y + 1) - at(x, y - 1)) * s;
-    const nx = -gx, ny = gy, nz = 1;
-    const il = 1 / Math.hypot(nx, ny, nz);
-    const i = (y * W + x) * 4;
-    d[i]     = (nx * il * 0.5 + 0.5) * 255;
-    d[i + 1] = (ny * il * 0.5 + 0.5) * 255;
-    d[i + 2] = (nz * il * 0.5 + 0.5) * 255;
-    d[i + 3] = 255;
+  /* The straightforward form of this — an at(x, y) closure doing two modulos
+     per read, four reads and a Math.hypot per pixel — is the single most
+     expensive thing in the whole boot. Over a 1024x1024 surface that is four
+     million modulo pairs and a million hypot calls, and it showed up as
+     160ms frozen frames while the world built.
+     Same arithmetic, hoisted: the row offsets are computed once per row, the
+     column wrap is a comparison instead of a modulo, and hypot becomes the
+     plain sqrt it is here (these components cannot overflow, which is the
+     only thing hypot's scaling buys). Byte-for-byte the same normal map. */
+  const s = strength || 2.4, ks = s / 255;
+  for (let y = 0; y < H; y++) {
+    const rC = y * W;
+    const rU = (y === 0 ? H - 1 : y - 1) * W;
+    const rD = (y === H - 1 ? 0 : y + 1) * W;
+    for (let x = 0; x < W; x++) {
+      const xL = x === 0 ? W - 1 : x - 1;
+      const xR = x === W - 1 ? 0 : x + 1;
+      const gx = (src[(rC + xR) * 4] - src[(rC + xL) * 4]) * ks;
+      const gy = (src[(rD + x) * 4] - src[(rU + x) * 4]) * ks;
+      const nx = -gx, ny = gy;
+      const il = 1 / Math.sqrt(nx * nx + ny * ny + 1);
+      const i = (rC + x) * 4;
+      d[i]     = (nx * il * 0.5 + 0.5) * 255;
+      d[i + 1] = (ny * il * 0.5 + 0.5) * 255;
+      d[i + 2] = (il * 0.5 + 0.5) * 255;
+      d[i + 3] = 255;
+    }
   }
   ox.putImageData(im, 0, 0);
   return out;
@@ -1295,7 +1310,7 @@ export function createKageWorld(options) {
   const TEMPLE_Z = -44;          /* the hall's centre line                  */
 
   function buildShell() {
-    const wallT = texWall();
+    const wallT = lib('wall', texWall);
     const wallMap = tx(wallT.map, { wrap: THREE.RepeatWrapping, repeat: [4, 1.4] });
     const wallNrm = tx(wallT.normal, { wrap: THREE.RepeatWrapping, repeat: [4, 1.4], srgb: false });
     const wallMat = new THREE.MeshStandardMaterial({
@@ -1307,7 +1322,7 @@ export function createKageWorld(options) {
 
     /* the sky, hung far enough back that the whole frustum sits inside it */
     const sky = new THREE.Mesh(new THREE.PlaneGeometry(360, 190),
-      new THREE.MeshBasicMaterial({ color: hdr(0.60, 0.70, 0.80), map: tx(texSky()),
+      new THREE.MeshBasicMaterial({ color: hdr(0.60, 0.70, 0.80), map: tx(lib('sky', texSky)),
         depthWrite: false, fog: false, toneMapped: false }));
     sky.position.set(0, 62, -108); sky.renderOrder = 0; scene.add(sky);
     WORLD.sky = sky;
@@ -1316,18 +1331,18 @@ export function createKageWorld(options) {
        which is the only reason the ground plane can just stop out there.
        z, centre y, width, height, x — kept low: a crest that climbs past the
        hall's eaves stops reading as distance and starts reading as a cut-out */
-    const ridgeMap = tx(texRidge(), { wrap: THREE.RepeatWrapping, repeat: [1.7, 1] });
+    const ridgeMap = tx(lib('ridge', texRidge), { wrap: THREE.RepeatWrapping, repeat: [1.7, 1] });
     [[-90, 13, 300, 26, 0], [-63, 9.5, 210, 19, 16]].forEach((r, i) => {
       const m = new THREE.Mesh(new THREE.PlaneGeometry(r[2], r[3]),
         /* fog off: at a hundred metres it would lift a black silhouette to
            80% of the fog colour, and the treeline came back as a *pale* band */
-        new THREE.MeshBasicMaterial({ map: i ? tx(texRidge()) : ridgeMap, transparent: true,
+        new THREE.MeshBasicMaterial({ map: i ? tx(lib('ridge', texRidge)) : ridgeMap, transparent: true,
           color: i ? 0x0c1420 : 0x080d16, depthWrite: false, fog: false }));
       m.position.set(r[4], r[1], r[0]); m.renderOrder = 1; scene.add(m);
     });
 
     /* floor + podium */
-    const fT = texFloor();
+    const fT = lib('floor', texFloor);
     const floorMat = new THREE.MeshStandardMaterial({
       map: tx(fT.map, { wrap: THREE.RepeatWrapping, repeat: [7, 7], aniso: 16 }),
       normalMap: tx(fT.normal, { wrap: THREE.RepeatWrapping, repeat: [7, 7], srgb: false, aniso: 16 }),
@@ -1392,7 +1407,7 @@ export function createKageWorld(options) {
     /* the paper the lamps burn through — the only thing in the hall that is
        allowed to be bright, and even then only just above white */
     const paper = new THREE.MeshBasicMaterial({ color: hdr(0.62, 1.06, 1.02), fog: true, toneMapped: false });
-    const grid  = new THREE.MeshBasicMaterial({ map: tx(texShoji()), transparent: true,
+    const grid  = new THREE.MeshBasicMaterial({ map: tx(lib('shoji', texShoji)), transparent: true,
       depthWrite: false, fog: true });
     WORLD.paper = paper;
 
@@ -2471,13 +2486,33 @@ export function createKageWorld(options) {
      Here the same list is drained by the render loop itself — one job per
      frame, nothing drawn until the last one lands. No preloader is needed
      because the page is already complete without the world. */
+  /* One builder per frame is only smooth if no builder outruns a frame, and
+     three of them did: shell 295ms, temple 287ms, torii 121ms on a machine
+     throttled 4x — each one a visibly frozen frame while the world came up.
+     Nearly all of it was procedural texture generation (a 2048x512 ridge, a
+     Sobel normal pass per surface), not geometry.
+
+     So the textures are pulled out in front as jobs of their own. lib() is a
+     memo, so the builder that follows finds them already made and spends its
+     frame on geometry alone. Nothing is generated that was not generated
+     before — it is the same work, cut where the frame boundaries fall. */
   const JOBS = [
     () => { buildLights(); },
+    () => { lib('wall', texWall); },
+    () => { lib('sky', texSky); },
+    () => { lib('ridge', texRidge); },
+    () => { lib('floor', texFloor); },
     () => { buildShell(); },
+    () => { wallWood(); },
+    () => { postWood(); },
+    () => { lib('roof', () => texRoof()); },
+    () => { lib('shoji', texShoji); },
     () => { buildTemple(); },
     () => { buildMoon(); },
+    () => { lib('lacquer', () => texLacquer()); },
     () => { buildTorii(); },
     () => { buildRocks(); },
+    () => { lib('granite', () => texStone(17)); },
     () => { buildLantern(7.4, -7.0, 1.15); buildLantern(-7.6, -5.2, 1.0); },
     () => {
       /* The pairs flanking the flight stand on the rail rather than beside

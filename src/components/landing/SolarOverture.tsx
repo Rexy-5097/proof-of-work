@@ -206,7 +206,9 @@ export function SolarOverture() {
       // Still in flight — leave it; the `seeked` handler below calls back in
       // with whatever `target` has become by then.
       if (video.seeking) return;
-      if (Math.abs(target - applied) < 1 / 30) return;
+      // One frame of the delivered file, which is 15fps. Any smaller step
+      // asks the decoder for a frame it is already showing.
+      if (Math.abs(target - applied) < 1 / 15) return;
       applied = target;
       video.currentTime = target;
     };
@@ -221,6 +223,29 @@ export function SolarOverture() {
       apply();
     };
 
+    // Warm the buffer once the page is done loading.
+    //
+    // `preload="metadata"` is right for the first paint and wrong for
+    // everything after it: it leaves the file to arrive on demand, so every
+    // seek during a scroll is a fresh range request. On a fast link that is
+    // invisible; on a slow one it is the whole fault — measured over a
+    // throttled 3G connection, a full scroll through the prologue completed
+    // 20 seeks instead of 107, the worst taking 989ms, and the star stepped
+    // in visible jumps because the decoder was waiting on the network.
+    //
+    // Raising it to "auto" after load moves those bytes off the interaction
+    // path and into the seconds while the reader is still on the first beat,
+    // without touching the LCP window that made "metadata" necessary.
+    let warm = 0;
+    const warmUp = () => { video.preload = "auto"; };
+    const scheduleWarm = () => {
+      warm = typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback(warmUp, { timeout: 2000 })
+        : window.setTimeout(warmUp, 600);
+    };
+    if (document.readyState === "complete") scheduleWarm();
+    else window.addEventListener("load", scheduleWarm, { once: true });
+
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
     video.addEventListener("loadedmetadata", update);
@@ -230,9 +255,14 @@ export function SolarOverture() {
     return () => {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
+      window.removeEventListener("load", scheduleWarm);
       video.removeEventListener("loadedmetadata", update);
       video.removeEventListener("seeked", apply);
       video.removeEventListener("loadeddata", prime);
+      if (warm) {
+        if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(warm);
+        else window.clearTimeout(warm);
+      }
     };
   }, []);
 
