@@ -73,7 +73,11 @@ export function SiteNav() {
         <Link
           href="/"
           onClick={handleAnchor("/proof#landing")}
-          className="flex items-center gap-2 font-mono text-label font-medium tracking-[0.08em] text-ink-hi"
+          // Same treatment as the menu button below: the seal-plus-wordmark
+          // row is 14px tall, so the padding brings the hit area to 34px and
+          // the negative margins cancel it back out of the layout — the mark
+          // does not move, it just becomes possible to hit with a thumb.
+          className="-my-2.5 -ml-2 flex items-center gap-2 py-2.5 pr-3 pl-2 font-mono text-label font-medium tracking-[0.08em] text-ink-hi"
         >
           <Seal state="verified" size={11} />
           SOUMYADEB TRIPATHY
