@@ -119,7 +119,11 @@ export function SiteNav() {
           aria-expanded={menuOpen}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           onClick={() => setMenuOpen((v) => !v)}
-          className="font-mono text-label text-ink-hi md:hidden"
+          // -my-2.5 py-2.5 keeps the 14px glyph box on the same baseline as
+          // the wordmark while giving the control a 34px hit area: at its
+          // natural height it was a 14px target, under WCAG 2.2 AA's 24px
+          // minimum and genuinely fiddly to hit on a phone.
+          className="-my-2.5 -mr-2 py-2.5 pr-2 pl-3 font-mono text-label text-ink-hi md:hidden"
         >
           {menuOpen ? "CLOSE" : "MENU"}
         </button>

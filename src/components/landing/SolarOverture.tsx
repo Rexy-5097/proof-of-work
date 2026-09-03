@@ -386,7 +386,11 @@ export function SolarOverture() {
           SCROLL ↓
         </motion.p>
 
-        <div className="absolute right-[var(--page-margin)] bottom-[var(--page-margin)] flex items-center gap-4">
+        {/* Lifted clear of the scroll cue on a phone. The credit is two tidy
+            lines at desktop widths and four at 390px, and those four grew up
+            into the cue's line — "Center" sat directly on "SCROLL". Measured
+            overlap at 390x844: credit 753-824, cue 810-824. */}
+        <div className="absolute right-[var(--page-margin)] bottom-[calc(var(--page-margin)+2.25rem)] flex items-center gap-4 lg:bottom-[var(--page-margin)]">
           <Credit />
           <a
             href="/proof"

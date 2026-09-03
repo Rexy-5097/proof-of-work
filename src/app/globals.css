@@ -443,6 +443,30 @@ html[data-theme="paper"] [data-audit-section]::before {
   display: none;
 }
 
+/* Heavier on a phone, and deliberately so.
+   The desktop scrim is tuned for copy that occupies a column down the left of
+   a wide frame, with most of the world beside it rather than behind it. At
+   390px the copy spans the whole frame, so every paragraph crosses whatever
+   the camera happens to be pointing at — and the hall's lit shoji panels are
+   the brightest thing in the scene. Measured on the live site at 390x844:
+   median contrast under a paragraph was a healthy 5.3:1, but against the
+   brightest pixel inside the same text box it fell to 1.47:1, which is a
+   word or two of a sentence disappearing rather than a whole block being
+   dim. The radial also reaches further down the frame here because a phone
+   viewport is tall and narrow, so 58% of its height stopped short of the
+   copy that a wide one never had. */
+@media (max-width: 640px) {
+  html:not([data-theme="paper"]) [data-audit-section]::before {
+    background: radial-gradient(
+      120% 80% at 50% 50%,
+      rgb(4 7 11 / 0.82),
+      rgb(4 7 11 / 0.66) 48%,
+      rgb(4 7 11 / 0.28) 78%,
+      rgb(4 7 11 / 0)
+    );
+  }
+}
+
 /* The scrim above is deliberately light, because a wash heavy enough to
    carry this site's copy density would hide the world completely — and a
    world nobody can see is not worth the milliseconds it costs.
