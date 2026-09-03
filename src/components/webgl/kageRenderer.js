@@ -1786,9 +1786,15 @@ export function createKageWorld(options) {
          out of it. Sides get the widest margin because that is where a bank
          of grass is read as ending; the crest needs none, the blades already
          taper. */
+      /* vMapUv, not vUv. r151 split the single `vUv` varying into one per
+         texture slot (vMapUv, vAlphaMapUv, ...), so `vUv` no longer exists
+         in a built-in fragment shader and this injection silently failed to
+         compile — the whole foreground layer fell back to an invalid
+         program. These materials always carry a `map`, so vMapUv is always
+         declared. */
       sh.fragmentShader = sh.fragmentShader.replace('#include <alphatest_fragment>',
-        'float feX = smoothstep(0.0, 0.11, vUv.x) * (1.0 - smoothstep(0.89, 1.0, vUv.x));\n' +
-        'float feY = smoothstep(0.0, 0.07, vUv.y);\n' +
+        'float feX = smoothstep(0.0, 0.11, vMapUv.x) * (1.0 - smoothstep(0.89, 1.0, vMapUv.x));\n' +
+        'float feY = smoothstep(0.0, 0.07, vMapUv.y);\n' +
         'diffuseColor.a *= feX * feY;\n' +
         '#include <alphatest_fragment>');
     };

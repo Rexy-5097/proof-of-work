@@ -172,12 +172,27 @@ export function SolarOverture() {
   // Seeks are skipped while one is already in flight, and while the target
   // has not moved a frame's worth: queuing a seek per scroll event leaves the
   // decoder permanently behind the scroll position.
+  //
+  // But a skipped seek must be retried, and the earlier version had nothing to
+  // retry it with. Scrolling fast keeps `seeking` true almost continuously, so
+  // the last few scroll events of a flick were all dropped; then the scrolling
+  // stopped, no further scroll events fired, and the star simply stayed where
+  // the decoder happened to land. Measured on production: scrolling to the end
+  // of the prologue left the video at 34.7s of 39.9s and it never caught up.
+  // That is the "not animating" fault — it is not that the scrub never starts,
+  // it is that it stops partway and has no way back.
+  //
+  // Hence the split below: `target` is where the scroll says we should be and
+  // is always current, `applied` is the last seek actually issued, and `seeked`
+  // re-runs apply() the instant the decoder frees up. Every dropped update is
+  // recovered by the seek that dropped it.
   useEffect(() => {
     const video = videoRef.current;
     const section = sectionRef.current;
     if (!video || !section) return;
 
-    let last = -1;
+    let target = 0;
+    let applied = -1;
 
     const prime = () => {
       void video.play().then(() => video.pause()).catch(() => {});
@@ -185,28 +200,38 @@ export function SolarOverture() {
     if (video.readyState >= 2) prime();
     else video.addEventListener("loadeddata", prime, { once: true });
 
+    const apply = () => {
+      const duration = video.duration;
+      if (!Number.isFinite(duration) || duration === 0) return;
+      // Still in flight — leave it; the `seeked` handler below calls back in
+      // with whatever `target` has become by then.
+      if (video.seeking) return;
+      if (Math.abs(target - applied) < 1 / 30) return;
+      applied = target;
+      video.currentTime = target;
+    };
+
     const update = () => {
       const duration = video.duration;
       if (!Number.isFinite(duration) || duration === 0) return;
-      if (video.seeking) return;
       const span = section.offsetHeight - window.innerHeight;
       if (span <= 0) return;
       const p = clamp01(-section.getBoundingClientRect().top / span);
-      const next = p * (duration - 0.05);
-      if (Math.abs(next - last) < 1 / 30) return;
-      last = next;
-      video.currentTime = next;
+      target = p * (duration - 0.05);
+      apply();
     };
 
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
     video.addEventListener("loadedmetadata", update);
+    video.addEventListener("seeked", apply);
     update();
 
     return () => {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
       video.removeEventListener("loadedmetadata", update);
+      video.removeEventListener("seeked", apply);
       video.removeEventListener("loadeddata", prime);
     };
   }, []);

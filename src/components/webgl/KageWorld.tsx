@@ -4,6 +4,19 @@ import { useEffect, useRef } from "react";
 import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
 import { createKageWorld, type KageWorld as KageWorldApi } from "./kageRenderer";
 
+/** requestIdleCallback where it exists, a short timer where it does not
+ *  (Safari only shipped it in 17). Either way the point is the same: start
+ *  after the page has drawn, not during. */
+const requestIdle = (fn: () => void): number =>
+  typeof window.requestIdleCallback === "function"
+    ? window.requestIdleCallback(fn, { timeout: 1200 })
+    : window.setTimeout(fn, 200);
+
+const cancelIdle = (id: number): void => {
+  if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(id);
+  else window.clearTimeout(id);
+};
+
 /**
  * The world the audit is read inside — ThreeUI's Kage temple, ported.
  *
@@ -46,20 +59,34 @@ export function KageWorld() {
     let disposed = false;
     let cleanup: (() => void) | undefined;
 
-    // Not on mount, and not on first idle either: the solar prologue owns
-    // the whole first screen and several more after it, so for as long as
-    // the reader is still inside the gate there is literally nothing of this
-    // world on screen. Building it then would put three, twenty procedural
-    // canvases and a bloom chain squarely in the load path to render pixels
-    // nobody can see. The trigger is the first real scroll instead — checked
-    // once immediately too, so a restored scroll position or a deep link
-    // into the middle of the audit still gets the world.
+    // Deferred, but not gated on scrolling.
+    //
+    // This used to wait until the reader had scrolled half a viewport down,
+    // which was correct when the solar prologue and the audit were one page:
+    // the prologue owned the first several screens, so there was nothing of
+    // this world on show and building it early would have put three, twenty
+    // procedural canvases and a bloom chain in the load path to render pixels
+    // nobody could see. Splitting the prologue onto its own route invalidated
+    // that: a reader arriving at /proof is at scroll 0 looking straight at the
+    // world, and the old gate held it back until they scrolled — so the
+    // background appeared to arrive late, only once the page had moved.
+    //
+    // What still matters is staying out of the load path, and that is what
+    // the idle callback buys. The build itself is already spread over frames
+    // by the renderer's job queue, so starting at first idle costs nothing
+    // measurable and the world is up within a frame or two of the page
+    // settling. The timeout is the floor: on a busy main thread idle may
+    // never come, and waiting forever is the same bug in a different costume.
+    //
+    // Scroll stays as a second trigger, now unconditional — any scroll means
+    // the reader is moving and the world should already be there.
     let armed = false;
+    let idle = 0;
     const build = () => {
       if (armed || disposed) return;
-      if ((window.scrollY || window.pageYOffset || 0) < window.innerHeight * 0.5) return;
       armed = true;
       window.removeEventListener("scroll", build);
+      if (idle) cancelIdle(idle);
 
       void import("three").then((THREE) => {
         if (disposed) return;
@@ -123,11 +150,12 @@ export function KageWorld() {
     };
 
     window.addEventListener("scroll", build, { passive: true });
-    build();
+    idle = requestIdle(build);
 
     return () => {
       disposed = true;
       window.removeEventListener("scroll", build);
+      if (idle) cancelIdle(idle);
       cleanup?.();
     };
   }, [animate]);

@@ -412,7 +412,13 @@ html.pow-rippling::view-transition-new(root) {
 [data-audit-section]::before {
   content: "";
   position: absolute;
-  inset: -20% -6%;
+  /* Horizontally flush, not bled. A -6% side bleed pushed the scrim past
+     the document on both edges and gave every viewport a sideways scroll of
+     exactly 6% of the section width — 86px at 1440, 23px at 390. Nothing was
+     lost by squaring it up: the gradient's outermost stop is already fully
+     transparent, so its last 6% was invisible anyway. The vertical bleed
+     stays; that axis already scrolls. */
+  inset: -20% 0;
   z-index: -1;
   pointer-events: none;
   background: radial-gradient(
