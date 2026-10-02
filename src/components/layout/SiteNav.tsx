@@ -8,6 +8,10 @@ import { Seal } from "@/components/primitives/Seal";
 import { useSound } from "@/components/providers/SoundProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { useLenis } from "@/components/providers/LenisProvider";
+import { useAuditProgress } from "@/components/providers/AuditProgressProvider";
+import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
+import { motion } from "motion/react";
+import type { AuditSectionId } from "@/data/site";
 
 /* The audit moved off "/" and onto its own route when the solar prologue
    became a gate, so every chapter anchor is now /proof#… — a real
@@ -20,6 +24,15 @@ const links = [
   { label: "Contact", href: "/proof#contact" },
 ] as const;
 
+/** Which nav entry the section under review belongs to. */
+const sectionToLink: Partial<Record<AuditSectionId, (typeof links)[number]["href"]>> = {
+  evidence: "/proof#evidence",
+  interlude: "/proof#evidence",
+  about: "/proof#about",
+  principles: "/proof#about",
+  contact: "/proof#contact",
+};
+
 export function SiteNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,6 +40,15 @@ export function SiteNav() {
   const { theme, toggleTheme } = useTheme();
   const { scrollTo } = useLenis();
   const pathname = usePathname();
+  const { current } = useAuditProgress();
+  const { animate } = useMotionPrefs();
+  // A sliding active hairline: it follows the reader
+  // through the audit, and sits under Journal anywhere in /engineering.
+  const activeHref = pathname.startsWith("/engineering")
+    ? "/engineering"
+    : pathname === "/proof" && current
+      ? sectionToLink[current]
+      : undefined;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -89,9 +111,21 @@ export function SiteNav() {
               key={l.href}
               href={l.href}
               onClick={handleAnchor(l.href)}
-              className="py-2 text-sm text-ink-md transition-colors duration-[var(--dur-tick)] hover:text-ink-hi"
+              aria-current={activeHref === l.href ? "location" : undefined}
+              className={cn(
+                "relative py-2 text-sm transition-colors duration-[var(--dur-tick)] hover:text-ink-hi",
+                activeHref === l.href ? "text-ink-hi" : "text-ink-md",
+              )}
             >
               {l.label}
+              {activeHref === l.href ? (
+                <motion.span
+                  layoutId="nav-active"
+                  aria-hidden="true"
+                  transition={animate ? { type: "spring", stiffness: 380, damping: 34 } : { duration: 0 }}
+                  className="absolute inset-x-0 -bottom-px h-px bg-ink-hi"
+                />
+              ) : null}
             </Link>
           ))}
           <button

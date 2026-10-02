@@ -11,6 +11,7 @@ import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import { BootSequence } from "@/components/boot/BootSequence";
 import { Footer } from "@/components/layout/Footer";
 import { ConsoleGreeting } from "@/components/chrome/ConsoleGreeting";
+import { InspectCursor } from "@/components/chrome/InspectCursor";
 import { site } from "@/data/site";
 import "lenis/dist/lenis.css";
 import "./globals.css";
@@ -102,6 +103,7 @@ export default function RootLayout({
                   {children}
                   <Footer />
                   <ConsoleGreeting />
+                  <InspectCursor />
                 </AuditProgressProvider>
               </LenisProvider>
             </SoundProvider>

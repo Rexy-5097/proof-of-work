@@ -87,7 +87,7 @@ export function ChapterShell({
                     figure stays readable. No effect on desktop, where the
                     panel is already wider than the minimum. */}
                 <div className="-mx-1 overflow-x-auto px-1 pb-1 md:overflow-x-visible">
-                  <div className="min-w-[600px] md:min-w-0">{visual}</div>
+                  <div data-cursor="crosshair" className="min-w-[600px] md:min-w-0">{visual}</div>
                 </div>
                 <p className="mono-label mt-2 text-[0.625rem] md:hidden" aria-hidden="true">
                   SCROLL FIGURE →

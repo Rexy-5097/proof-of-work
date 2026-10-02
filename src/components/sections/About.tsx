@@ -1,6 +1,7 @@
 import { Container } from "@/components/layout/Section";
 import { SectionLabel } from "@/components/primitives/SectionLabel";
 import { Reveal } from "@/components/primitives/Reveal";
+import { Credential } from "@/components/effects/Credential";
 
 /** 02 / THE ENGINEER — mindset, not project descriptions. */
 export function About() {
@@ -8,12 +9,16 @@ export function About() {
     <Container>
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-5">
-          <Reveal>
+          <Reveal variant="focus">
             <SectionLabel number="02" label="THE ENGINEER" as="h2" className="mb-6" />
             <p className="max-w-[16ch] font-display text-[length:var(--t-h1)] leading-[1.1] text-ink-hi">
               I got interested in the moment things break.
             </p>
           </Reveal>
+          {/* Not inside a <Reveal>: the credential runs its own entrance
+              (it drops in on its rope), and a transformed ancestor would
+              re-base the physics' coordinate space mid-swing. */}
+          <Credential className="mt-12 max-w-[420px]" />
         </div>
         <div className="space-y-6 lg:col-span-6 lg:col-start-7">
           <Reveal delay={0.1}>
