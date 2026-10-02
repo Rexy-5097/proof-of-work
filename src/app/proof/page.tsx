@@ -1,10 +1,13 @@
 import { Container, Section } from "@/components/layout/Section";
 import { KageWorld } from "@/components/webgl/KageWorld";
+import { EvidenceReveal, RevealHint } from "@/components/webgl/EvidenceReveal";
 import { HeroBackdrop } from "@/components/sections/HeroBackdrop";
 import { Spotlight } from "@/components/effects/Spotlight";
 import { TextGenerate } from "@/components/effects/TextGenerate";
 import { TracingBeam } from "@/components/effects/TracingBeam";
 import { ActMarker } from "@/components/effects/ActMarker";
+import { EvidenceTape } from "@/components/effects/EvidenceTape";
+import { InstrumentClock } from "@/components/effects/InstrumentClock";
 import { About } from "@/components/sections/About";
 import { Principles } from "@/components/sections/Principles";
 import { Interlude } from "@/components/sections/Interlude";
@@ -63,15 +66,64 @@ export default function Proof() {
 
       {/* overflow-hidden: the Spotlight is deliberately larger than the
           viewport and offset, so its container must clip it (as Aceternity's
-          own demo does) or it widens the document by a few pixels. */}
-      <Section id="landing" className="flex min-h-svh items-center overflow-hidden bg-[image:var(--ambient-act1)]">
+          own demo does) or it widens the document by a few pixels.
+          flex-col + my-auto keeps the claim centred while the evidence tape
+          sits on the section's bottom edge and closes the hero. */}
+      <Section
+        id="landing"
+        className="flex min-h-svh flex-col overflow-hidden bg-[image:var(--ambient-act1)] !pb-0 lg:!pt-28"
+      >
         <HeroBackdrop />
         <Spotlight className="-top-40 left-0 md:-top-20 md:left-60" />
-        <Container className="relative">
-          <p className="mono-label mb-6 tracking-[0.14em]">PROOF OF WORK</p>
+        {/* The portrait sits under the fluid lens and over the world: same
+            stacking level as the canvas, earlier in the DOM. <EvidenceReveal>
+            measures [data-portrait] and prints the evidence scan of this
+            exact frame onto its plate, so the lens turns the photograph
+            into its scan. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] hidden lg:block">
+          <div className="relative mx-auto h-full max-w-[var(--content-max)]">
+            {/* eslint-disable-next-line @next/next/no-img-element -- measured
+                by the lens; a plain element keeps its box equal to the image */}
+            <img
+              data-portrait
+              src="/portrait/portrait.webp"
+              alt=""
+              width={870}
+              height={1158}
+              decoding="async"
+              className="hero-portrait absolute right-[calc(var(--page-margin)-24px)] bottom-12 h-[min(78%,760px)] w-auto select-none"
+            />
+          </div>
+        </div>
+        <EvidenceReveal />
+        <Container className="relative z-[2] my-auto">
+          {/* Phones get the portrait in flow, above the claim. No lens there
+              (touch scrolls), so it is just the photograph. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/portrait/portrait.webp"
+            alt="Soumyadeb Tripathy"
+            width={870}
+            height={1158}
+            decoding="async"
+            className="hero-portrait mx-auto -mb-4 h-[min(46svh,360px)] w-auto lg:hidden"
+          />
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+            <p className="mono-label tracking-[0.14em]">PROOF OF WORK</p>
+            <p className="mono-label flex items-center gap-2">
+              <span aria-hidden="true" className="relative flex h-1.5 w-1.5">
+                <span className="absolute inset-0 rounded-full bg-data motion-safe:animate-ping motion-safe:[animation-duration:2s]" />
+                <span className="relative h-1.5 w-1.5 rounded-full bg-data" />
+              </span>
+              <span>
+                AVAILABLE <span className="text-ink-lo/70">—</span>{" "}
+                <span className="text-ink-md">BACKEND &amp; AI-SYSTEMS ROLES</span>
+              </span>
+            </p>
+          </div>
           <h1
             id="hero-headline"
-            className="max-w-[17ch] font-display text-[length:var(--t-display)] leading-[1.02] tracking-[-0.015em] text-ink-hi"
+            className="max-w-[17ch] font-display text-[length:var(--t-display)] leading-[1.02] tracking-[-0.015em] text-ink-hi lg:max-w-[15ch] lg:text-[clamp(3.4rem,5.4vw,5.5rem)]"
           >
             <TextGenerate words="I build software that stays correct when things fail — and I publish the evidence." />
           </h1>
@@ -86,11 +138,16 @@ export default function Proof() {
               Open channel
             </Button>
           </div>
-          <p className="mono-label mt-16">
-            BUILD {process.env.NEXT_PUBLIC_BUILD_SHA}{" "}
-            <span className="text-seal">◆ VERIFIED</span>
-          </p>
+          <div className="mt-12 flex flex-wrap items-center justify-between gap-x-8 gap-y-3">
+            <p className="mono-label">
+              BUILD {process.env.NEXT_PUBLIC_BUILD_SHA}{" "}
+              <span className="text-seal">◆ VERIFIED</span>
+            </p>
+            <RevealHint />
+            <InstrumentClock className="font-mono text-micro tracking-[0.06em]" />
+          </div>
         </Container>
+        <EvidenceTape className="relative z-[2] mt-12" />
       </Section>
 
       <Section id="thesis" labelledBy="thesis-h">

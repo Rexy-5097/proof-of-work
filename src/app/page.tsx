@@ -25,6 +25,7 @@ const personJsonLd = {
   jobTitle: "Backend & AI Systems Engineer",
   email: `mailto:${site.email}`,
   url: site.url,
+  image: `${site.url}/portrait/portrait.webp`,
   sameAs: [
     "https://github.com/Rexy-5097",
     "https://www.linkedin.com/in/soumyadeb-tripathy/",

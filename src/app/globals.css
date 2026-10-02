@@ -485,3 +485,310 @@ html:not([data-theme="paper"]) [data-audit-section]
     0 1px 20px rgb(3 6 8 / 0.92),
     0 0 4px rgb(3 6 8 / 0.60);
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   The inspection cursor (components/chrome/InspectCursor.tsx).
+
+   Every moving part is positioned by a transform written from one rAF
+   loop; nothing here transitions position, only opacity and size, so the
+   lock is driven by the loop's smoothing and never fights a CSS tween.
+   The layer only exists while html.pow-cursor is set, which the component
+   adds after its capability gate passes — touch, reduced motion and narrow
+   viewports keep the native cursor and never load a rule of this. */
+html.pow-cursor,
+html.pow-cursor * {
+  cursor: none !important;
+}
+
+html.pow-cursor :is(input, textarea, [contenteditable="true"]) {
+  cursor: text !important;
+}
+
+.pow-cursor-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-ui) var(--ease-out-pow);
+}
+
+.pow-cursor-layer[data-visible] {
+  opacity: 1;
+}
+
+.pow-cursor-layer[data-mode="text"] {
+  opacity: 0;
+}
+
+.pow-cursor-dot,
+.pow-cursor-cross,
+.pow-cursor-corner,
+.pow-cursor-tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+.pow-cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 999px;
+  background: var(--ink-hi);
+  box-shadow: 0 0 0 1px rgb(4 7 11 / 0.55);
+  transition:
+    width var(--dur-tick) var(--ease-out-pow),
+    height var(--dur-tick) var(--ease-out-pow),
+    margin var(--dur-tick) var(--ease-out-pow),
+    opacity var(--dur-tick) linear;
+}
+
+.pow-cursor-layer[data-mode="inspect"] .pow-cursor-dot {
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+}
+
+.pow-cursor-layer[data-mode="crosshair"] .pow-cursor-dot {
+  opacity: 0;
+}
+
+/* A hairline cross: two 1px bars drawn with gradients on one element, so the
+   crosshair costs one transform write like everything else. */
+.pow-cursor-cross {
+  width: 13px;
+  height: 13px;
+  margin: -6px 0 0 -6px;
+  opacity: 0;
+  background:
+    linear-gradient(var(--ink-hi), var(--ink-hi)) center / 1px 100% no-repeat,
+    linear-gradient(var(--ink-hi), var(--ink-hi)) center / 100% 1px no-repeat;
+  transition: opacity var(--dur-tick) linear;
+}
+
+.pow-cursor-layer[data-mode="crosshair"] .pow-cursor-cross {
+  opacity: 1;
+}
+
+.pow-cursor-corner {
+  width: 9px;
+  height: 9px;
+  border: 0 solid var(--ink-md);
+  transition:
+    opacity var(--dur-tick) linear,
+    border-color var(--dur-tick) linear;
+}
+
+.pow-cursor-corner[data-corner="0"] { border-top-width: 1.5px; border-left-width: 1.5px; }
+.pow-cursor-corner[data-corner="1"] { border-top-width: 1.5px; border-right-width: 1.5px; }
+.pow-cursor-corner[data-corner="2"] { border-bottom-width: 1.5px; border-right-width: 1.5px; }
+.pow-cursor-corner[data-corner="3"] { border-bottom-width: 1.5px; border-left-width: 1.5px; }
+
+.pow-cursor-layer:is([data-mode="inspect"], [data-mode="link"]) .pow-cursor-corner {
+  border-color: var(--ink-hi);
+}
+
+.pow-cursor-layer[data-mode="crosshair"] .pow-cursor-corner {
+  opacity: 0;
+}
+
+.pow-cursor-tag {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  color: var(--ink-md);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 6px rgb(3 6 8 / 0.9);
+  opacity: 0;
+  transition: opacity var(--dur-tick) linear;
+}
+
+.pow-cursor-layer:is([data-mode="inspect"], [data-mode="crosshair"]) .pow-cursor-tag {
+  opacity: 1;
+}
+
+html[data-theme="light"] .pow-cursor-dot {
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.7);
+}
+
+html[data-theme="light"] .pow-cursor-tag {
+  text-shadow: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   The evidence tape (components/effects/EvidenceTape.tsx). Two identical
+   runs side by side; the track slides exactly one run's width and loops,
+   so the seam is never visible. Pauses under pointer or focus, and does
+   not move at all under reduced motion — it becomes a sideways-scrollable
+   strip instead. */
+@keyframes tape {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.evidence-tape-track {
+  animation: tape 90s linear infinite;
+}
+
+.evidence-tape:hover .evidence-tape-track,
+.evidence-tape:focus-within .evidence-tape-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .evidence-tape {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .evidence-tape-track {
+    animation: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Audit rail proximity (components/layout/AuditRail.tsx). One custom
+   property per item, written by the rail's rAF loop; everything visible is
+   derived from it here. The label is absolutely positioned and never takes
+   pointer events, so a hidden label can't sit invisibly over the page and
+   swallow clicks meant for the content beside the rail. */
+.audit-rail__item {
+  --effect: 0;
+}
+
+.audit-rail__tick {
+  display: block;
+  height: 1px;
+  width: 6px;
+  background: var(--line-strong);
+  transform-origin: left center;
+}
+
+.audit-rail__label {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-left: 8px;
+  translate: 0 -50%;
+  pointer-events: none;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+  text-shadow: 0 0 8px var(--bg-0), 0 0 2px var(--bg-0);
+  transition:
+    opacity var(--dur-ui) var(--ease-out-pow),
+    clip-path var(--dur-ui) var(--ease-out-pow);
+}
+
+/* Without physics (reduced motion): the original one-item reveal. */
+.audit-rail:not(.audit-rail--physics) .audit-rail__link:hover .audit-rail__label,
+.audit-rail__link:focus-visible .audit-rail__label {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+}
+
+.audit-rail--physics .audit-rail__link {
+  transform: translateX(calc(var(--effect) * 6px));
+}
+
+.audit-rail--physics .audit-rail__tick {
+  transform: scaleX(calc(1 + var(--effect) * 1.7));
+  background: color-mix(in oklab, var(--ink-md) calc(var(--effect) * 100%), var(--line-strong));
+}
+
+.audit-rail--physics .audit-rail__num {
+  color: color-mix(in oklab, var(--ink-hi) calc(var(--effect) * 100%), var(--ink-lo));
+}
+
+/* The physics drives the label directly — no CSS transition on top of the
+   loop's own smoothing, or the two would compound into lag. */
+.audit-rail--physics .audit-rail__label {
+  transition: none;
+  opacity: var(--effect);
+  clip-path: inset(0 calc((1 - var(--effect)) * 100%) 0 0);
+}
+
+.audit-rail--physics .audit-rail__link:focus-visible .audit-rail__label {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   The credential (components/effects/Credential.tsx). Position and swing
+   are written by the rope simulation; only the flip is CSS, and it uses the
+   token duration so reduced motion turns the card over instantly. */
+.credential-card {
+  perspective: 1000px;
+  will-change: transform;
+}
+
+.credential[data-live] .credential-strap-fallback {
+  display: none;
+}
+
+.credential-flip {
+  transform-style: preserve-3d;
+  transition: transform var(--dur-cinema) var(--ease-out-pow);
+}
+
+.credential-flip.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.credential-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.credential-back {
+  transform: rotateY(180deg);
+}
+
+.credential-card:focus-visible {
+  outline: none;
+}
+
+.credential-card:focus-visible .credential-face {
+  outline: 2px solid var(--data);
+  outline-offset: 3px;
+}
+
+/* The credential photo's lens: the scan shows only inside a soft circle at
+   the pointer, and only while the pointer is over the photo. Fine pointers
+   only — on touch, the scan lives on the card's back instead. */
+.credential-photo__scan {
+  opacity: 0;
+  -webkit-mask-image: radial-gradient(circle 46px at var(--lx, 50%) var(--ly, 40%), #000 55%, transparent 100%);
+  mask-image: radial-gradient(circle 46px at var(--lx, 50%) var(--ly, 40%), #000 55%, transparent 100%);
+  transition: opacity var(--dur-ui) var(--ease-out-pow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .credential-photo:hover .credential-photo__scan {
+    opacity: 1;
+  }
+}
+
+/* The hero portrait. The source photo is cropped through the jacket on both
+   sides; feathering the outer 12% turns those straight cuts into shoulders
+   that fall away into the scene. The bottom fade is baked into the asset
+   (design/portrait-assets.py). The lens prints its scan over this exact box,
+   so nothing here may change the element's size or position. */
+.hero-portrait {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 13%, #000 87%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 13%, #000 87%, transparent);
+}
+
+/* The tape's track is promoted once and its layer clipped: the loop is a
+   pure compositor transform and never repaints the hero around it. */
+.evidence-tape {
+  contain: paint;
+}
+.evidence-tape-track {
+  will-change: transform;
+}

@@ -1,18 +1,38 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Container } from "@/components/layout/Section";
 import { SectionLabel } from "@/components/primitives/SectionLabel";
 import { Reveal } from "@/components/primitives/Reveal";
 import { Seal } from "@/components/primitives/Seal";
 import { useViz } from "@/hooks/useViz";
 import { timeline } from "@/data/timeline";
+import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
+import { TrajectoryTrack } from "./TrajectoryTrack";
 
 /**
  * 06 / TRAJECTORY — progression as escalation of constraints, not dates.
  * A vertical thread DRAWs downward; each stage stamps as it's crossed.
+ *
+ * This vertical list is the server output and the phone / reduced-motion
+ * layout. On a wide viewport with motion allowed it is swapped after mount
+ * for <TrajectoryTrack>, the horizontal scroll-driven rail — same data,
+ * same stamps, read sideways.
  */
 export function Timeline() {
   const { ref, attrs } = useViz<HTMLOListElement>(0.1);
+  const { animate } = useMotionPrefs();
+  const [wide, setWide] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setWide(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  if (animate && wide) return <TrajectoryTrack />;
 
   return (
     <Container>

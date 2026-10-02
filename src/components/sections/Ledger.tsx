@@ -8,6 +8,8 @@ import { SectionLabel } from "@/components/primitives/SectionLabel";
 import { Reveal } from "@/components/primitives/Reveal";
 import { ledger, type LedgerCategory, type LedgerStatus } from "@/data/ledger";
 import { useSound } from "@/components/providers/SoundProvider";
+import { useMotionPrefs } from "@/components/providers/MotionPrefsProvider";
+import { motion } from "motion/react";
 
 const FILTERS: { label: string; value: LedgerCategory | "all" }[] = [
   { label: "ALL", value: "all" },
@@ -37,6 +39,7 @@ export function Ledger() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("year");
   const { play } = useSound();
+  const { animate } = useMotionPrefs();
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -82,13 +85,21 @@ export function Ledger() {
                 play("tap");
               }}
               className={cn(
-                "mono-label cursor-pointer rounded-full border px-3.5 py-1.5 transition-colors duration-[var(--dur-tick)]",
-                filter === f.value
-                  ? "border-ink-md text-ink-hi"
-                  : "border-line hover:border-line-strong hover:text-ink-md",
+                "mono-label relative cursor-pointer rounded-full border border-line px-3.5 py-1.5 transition-colors duration-[var(--dur-tick)]",
+                filter === f.value ? "text-ink-hi" : "hover:border-line-strong hover:text-ink-md",
               )}
             >
-              {f.label}
+              {/* The active ring slides between chips. Still ink, never
+                  green: filtering isn't verifying. */}
+              {filter === f.value ? (
+                <motion.span
+                  layoutId="ledger-chip"
+                  aria-hidden="true"
+                  transition={animate ? { type: "spring", stiffness: 420, damping: 36 } : { duration: 0 }}
+                  className="absolute -inset-px rounded-full border border-ink-md"
+                />
+              ) : null}
+              <span className="relative">{f.label}</span>
             </button>
           ))}
           <div className="ml-auto flex items-center gap-3">
